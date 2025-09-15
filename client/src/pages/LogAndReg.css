@@ -1,0 +1,191 @@
+@import '@fortawesome/fontawesome-free/css/all.min.css';
+
+.welcome-login {
+    border: 1px solid black;
+    background-color :#4CA1AF;
+    margin: auto;
+    max-width: 350px;
+    min-height: 350px;   /* גובה התחלתי */
+    height: auto;  
+    text-align: center;
+    margin-top: 70px;
+    border-radius: 10%;
+    border: none;
+    box-shadow: 10px 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+.title-login {
+    font-family: 'Poppins', sans-serif;
+    color: rgb(255, 255, 255);
+    padding-top: 20px;
+    margin-bottom: -10px;
+    font-size: 25px;
+
+}
+
+.input-container {
+
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    /* רווח בין השדות */
+    width: 60%;
+    /* רוחב השדות ביחס לקופסה */
+    margin: auto;
+    margin-top: 30px;
+}
+
+.input-login,
+.input-pass {
+    padding: 8px 10px;
+    border: 2px solid #1E6091;
+    /* גבול כחול */
+    border-radius: 8px;
+    /* פינות קטנות למראה מרובע */
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+    background-color: #e7eded;
+    /* צבע רקע בהיר */
+}
+
+.input-login:focus,
+.input-pass:focus {
+    border-color: #9bcfcd;
+    /* צבע גבול כשממוקד */
+    box-shadow: 0 0 6px rgba(76, 193, 175, 0.4);
+    /* צל עדין */
+}
+.btn-login {
+  padding: 8px 10px;                  /* ריווח פנימי נוח */
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;     
+  width: 80px;    
+  margin: auto;               /* צבע הטקסט */
+  background-color: #1E6091;           /* כחול מודרני */
+  border: none;                        /* בלי גבול */
+  border-radius: 6px;                  /* פינות קטנות, תואם לשדות הקלט */
+  cursor: pointer;
+  transition: all 0.3s ease;           /* אנימציה חלקה לשינוי צבע */
+}
+
+.btn-login:hover {
+  background-color: #4CA1AF;           /* שינוי צבע בהובר */
+  box-shadow: 0 4px 10px rgba(76, 193, 175, 0.4); /* צל עדין */
+}
+
+.btn-linkedin {
+ font-family: 'Poppins', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;          /* מרווח בין האייקון לטקסט */
+  padding: 8px 25px;
+  width: 220px;
+ margin: auto;
+  font-size: 1rem;
+  color: white;
+  background-color: #0077B5;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.btn-linkedin:hover {
+  background-color: #005983;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+.btn-linkedin-reg {
+ font-family: 'Poppins', sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+   
+  padding: 8px 25px;
+  width: 230px;
+ margin-bottom: 10px;
+ display: flex;
+ align-items:center;
+ justify-content: center;
+  font-size: 1rem;
+  color: white;
+  background-color: #0077B5;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.btn-linkedin-reg:hover {
+  background-color: #005983;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+.toggle-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: auto;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+}
+
+.toggle-container span {
+  font-size: 1rem;
+  transition: color 0.3s ease;
+}
+
+.toggle-container .active {
+    margin-top: 10px;
+  color: #0077B5; /* כחול מודגש */
+}
+
+.toggle-container .inactive {
+  color: #fcfbfb;
+  margin-top: 10px;
+}
+
+.toggle-switch {
+  margin-top: 10px;
+  width: 80px;
+  height: 36px;
+  background: #ccc;
+  border-radius: 50px;
+  padding: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  transition: all 0.3s ease;
+}
+
+.toggle-circle {
+  width: 20px;
+  height: 20px;
+  background: white;
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.toggle-switch.login {
+  background: #0077B5; /* כחול ללוגין */
+}
+
+.toggle-switch.login .toggle-circle {
+  transform: translateX(0);
+}
+
+.toggle-switch.register {
+  background: #dbd7d7; /* ירוק לרגיסטר */
+}
+
+.toggle-switch.register .toggle-circle {
+  transform: translateX(44px);
+}
+
+

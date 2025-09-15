@@ -8,6 +8,7 @@ function App() {
   return (
     <>
     <div className='body-container'>
+      <h1 className='title-app'>CareerBoost AI</h1>
     <LogAndReg/>
     </div>
     </>
