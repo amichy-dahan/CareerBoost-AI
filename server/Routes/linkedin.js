@@ -1,0 +1,74 @@
+
+const express = require('express');
+const linkedinRoutes = express.Router();
+const jwt = require('jsonwebtoken');
+require("dotenv").config();
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+const axios = require('axios');
+const REDIRECT_URI = "http://localhost:3000/auth/linkedin/callback";
+const User = require("../models/User");
+
+
+// Route להתחברות
+linkedinRoutes.get("/linkedin", (req, res) => {
+    const scope = "openid profile email";
+    const state = "123456";
+    const linkedinAuthUrl =
+        `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${process.env.CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&state=${state}&scope=${encodeURIComponent(scope)}`;
+    res.redirect(linkedinAuthUrl);
+});
+
+// Route ל-callback
+linkedinRoutes.get("/linkedin/callback", async (req, res) => {
+    const code = req.query.code;
+    const state = req.query.state;
+
+    try {
+        const tokenResponse = await axios.post(
+            "https://www.linkedin.com/oauth/v2/accessToken",
+            null,
+            {
+                params: {
+                    grant_type: "authorization_code",
+                    code,
+                    redirect_uri: REDIRECT_URI,
+                    client_id: process.env.CLIENT_ID,
+                    client_secret: process.env.CLIENT_SECRET
+                },
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                }
+            }
+        );
+
+        const accessToken = tokenResponse.data.access_token;
+        const idToken = tokenResponse.data.id_token;
+
+        const decoded = jwt.decode(idToken);
+
+        let user = await User.findOne({ email: decoded.email });
+        if (!user) {
+            user = await User.create({
+                linkedinId: decoded.sub,
+                firstName: decoded.given_name,
+                lastName: decoded.family_name,
+                email: decoded.email,
+            });
+        }
+
+        
+        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+            expiresIn: "1h",
+        });
+
+        res.json({ user, token });
+
+      
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Something went wrong");
+    }
+});
+
+
+module.exports = linkedinRoutes;
