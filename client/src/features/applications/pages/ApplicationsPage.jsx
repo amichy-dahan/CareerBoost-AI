@@ -76,6 +76,9 @@ const ApplicationsPage = () => {
         <div className="container mx-auto px-6 py-8">
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
             <div>
+              <br />
+              <br />
+              <br />
               <h1 className="text-3xl font-bold text-foreground my-[15px]">Manage Applications</h1>
               <p className="text-muted-foreground mt-2">
                 Track your job applications and stay organized throughout your job search
