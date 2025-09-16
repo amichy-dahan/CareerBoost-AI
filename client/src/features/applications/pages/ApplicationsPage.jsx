@@ -6,6 +6,7 @@ import { useApplications } from "../hooks/useApplications.jsx";
 import { FiltersBar } from "../components/FiltersBar";
 import { ApplicationsTable } from "../components/ApplicationsTable";
 import { ApplicationDrawer } from "../components/ApplicationDrawer";
+import Navigation from "@/components/Navigation.jsx";
 const ApplicationsPage = () => {
   const [filters, setFilters] = useState({});
   const [page, setPage] = useState(1);
@@ -70,15 +71,18 @@ const ApplicationsPage = () => {
     });
     setEditingApplication(undefined);
   };
-  return <div className="min-h-screen bg-background">
+  return <>
+    <Navigation />
+    <div className="min-h-screen bg-background pt-16">
       {/* Header */}
       <div className="border-b bg-card">
         <div className="container mx-auto px-6 py-8">
+          <br />
+          <br />
+          <br />
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
             <div>
-              <br />
-              <br />
-              <br />
+
               <h1 className="text-3xl font-bold text-foreground my-[15px]">Manage Applications</h1>
               <p className="text-muted-foreground mt-2">
                 Track your job applications and stay organized throughout your job search
@@ -117,6 +121,7 @@ const ApplicationsPage = () => {
 
       {/* Add/Edit Drawer */}
       <ApplicationDrawer application={editingApplication} open={drawerOpen} onOpenChange={setDrawerOpen} onSave={handleSaveApplication} />
-    </div>;
+    </div>
+  </>;
 };
 export default ApplicationsPage;
