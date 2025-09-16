@@ -1,0 +1,35 @@
+*{
+  box-sizing: border-box;
+}
+
+.body-container{
+  background: linear-gradient(135deg, #0D3B66 0%, #1E6091 50%, #4CA1AF 100%);
+  background-repeat: no-repeat;
+  background-size: cover;
+  max-width: 1200px;
+  margin: auto;
+  text-align: center;
+  padding-top: 40px;
+  height: 100vh;
+
+}
+
+.title-app {
+  font-family: 'Poppins', sans-serif;  
+  font-size: 4rem;                     
+  font-weight: 700;                     
+  text-align: center;                   
+  background: linear-gradient(270deg, #e4eaef, #4CA1AF, #1E6091, #98bde0);
+  background-size: 1000% 1000%;      
+  -webkit-background-clip: text;       
+  -webkit-text-fill-color: transparent;
+  animation: colorShift 5s ease infinite;                  
+  letter-spacing: 2px;   
+            
+}
+
+@keyframes colorShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
