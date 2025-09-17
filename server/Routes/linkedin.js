@@ -9,19 +9,24 @@ const REDIRECT_URI = "http://localhost:3000/auth/linkedin/callback";
 const User = require("../models/User");
 
 
+let flow = "";
 // Route להתחברות
 linkedinRoutes.get("/linkedin", (req, res) => {
+    console.log("heloow");
+    flow = req.query.flow;
     const scope = "openid profile email";
     const state = "123456";
     const linkedinAuthUrl =
         `https://www.linkedin.com/oauth/v2/authorization?response_type=code&client_id=${process.env.CLIENT_ID}&redirect_uri=${encodeURIComponent(REDIRECT_URI)}&state=${state}&scope=${encodeURIComponent(scope)}`;
-    res.redirect(linkedinAuthUrl);
+    res.json({ url: linkedinAuthUrl });
 });
 
 // Route ל-callback
 linkedinRoutes.get("/linkedin/callback", async (req, res) => {
     const code = req.query.code;
     const state = req.query.state;
+
+    // "login" או "register"
 
     try {
         const tokenResponse = await axios.post(
@@ -41,30 +46,52 @@ linkedinRoutes.get("/linkedin/callback", async (req, res) => {
             }
         );
 
+
         const accessToken = tokenResponse.data.access_token;
         const idToken = tokenResponse.data.id_token;
+
 
         const decoded = jwt.decode(idToken);
 
         let user = await User.findOne({ email: decoded.email });
-        if (!user) {
+
+
+        if (flow === "login") {
+            if (!user) {
+                return res.redirect(`http://localhost:8080/login?error=${encodeURIComponent("User not registered. Please register first.")}`);
+            }
+        } else if (flow === "register") {
+            if (user) {
+                return res.redirect(`http://localhost:8080/login?error=${encodeURIComponent("User already exists. Please login.")}`);
+
+            }
             user = await User.create({
                 linkedinId: decoded.sub,
                 firstName: decoded.given_name,
                 lastName: decoded.family_name,
                 email: decoded.email,
-                // profileImage: decoded.picture || null
+                profileImage: decoded.picture || null
             });
         }
+        console.log(user);
 
-        
+
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
             expiresIn: "1h",
         });
 
-        res.json({ user, token });
 
-      
+        res.cookie("token", token, {
+            httpOnly: true,        // לא נגיש ל-JS בצד לקוח
+            secure: false,         // true אם https
+            sameSite: "lax",       // למניעת בעיות CORS
+            maxAge: 1000 * 60 * 60 // שעה
+        });
+
+        // Redirect ל-frontend
+        res.redirect("http://localhost:8080/dashboard");
+
+
     } catch (err) {
         console.error(err);
         res.status(500).send("Something went wrong");
