@@ -53,6 +53,7 @@ linkedinRoutes.get("/linkedin/callback", async (req, res) => {
                 firstName: decoded.given_name,
                 lastName: decoded.family_name,
                 email: decoded.email,
+                // profileImage: decoded.picture || null
             });
         }
 

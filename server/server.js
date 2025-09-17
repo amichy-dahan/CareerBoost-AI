@@ -8,14 +8,20 @@ const express = require('express')
 const router = require('../server/Routes/logRegRoute');
 const linkedinRoutes = require("../server/Routes/linkedin")
 const app = express();
+const cookieParser = require('cookie-parser');
 const port = 3000;
+const {authenticate} = require("../server/middellwares/authenticate");
 app.use(express.json());
-
+app.use(cookieParser());
 
 
 
 app.use('/users', router);
 app.use("/auth", linkedinRoutes);
+app.get("/protected", authenticate, (req, res) => {
+  res.json({ message: "You accessed a protected route!", user: req.user });
+});
+
 
 
 async function startDB() {
