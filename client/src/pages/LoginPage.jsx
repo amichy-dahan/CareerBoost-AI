@@ -32,6 +32,33 @@ const LoginPage = () => {
     e.preventDefault();
     console.log("Form submitted:", formData);
   };
+
+  const handlelogin = async (flow) =>{
+     try{
+      if(flow==="Sing in"){
+        const response = await axios.post("http://localhost:3000/users/login",{
+          email:formData.email,
+          password:formData.password
+        },{withCredentials:true});
+        console.log(response.data);
+        navigate("/dashboard");
+      }else{
+        const response = await axios.post("http://localhost:3000/users/register",{
+          full_name:formData.firstName+" "+formData.lastName,
+          email:formData.email,
+          password:formData.password},{withCredentials:true});
+          console.log(response.data);
+          navigate("/dashboard");
+      }
+       
+     }catch(error){
+      if(error.response&&error.response.data&&error.response.data.error){
+       alert(error.response.data.error);
+     }
+
+
+  }
+}
   const handleLinkedIn = async (flow) => {
     try {
       console.log(flow);
@@ -114,7 +141,7 @@ const LoginPage = () => {
             </button>
           </div>}
 
-          <Button type="submit" className="w-full h-12 bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 text-primary-foreground font-semibold mx-0 py-[21px] my-[29px]">
+          <Button onClick={() => handlelogin(isLogin ? "Sing in" : "Create")} type="submit" className="w-full h-12 bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 text-primary-foreground font-semibold mx-0 py-[21px] my-[29px]">
             {isLogin ? "Sign in" : "Create account"}
           </Button>
         </form>
