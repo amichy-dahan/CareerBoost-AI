@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 const Navigation = () => {
   return <nav className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b border-border bg-background my-0">
@@ -13,17 +13,42 @@ const Navigation = () => {
         </div>
         
         <div className="hidden md:flex items-center space-x-8">
-          
-          <Link to="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors mx-[9px]">
+          <NavLink
+            to="/dashboard"
+            className={({ isActive }) =>
+              `transition-colors mx-[9px] border-b-2 ${
+                isActive
+                  ? "font-bold text-foreground border-blue-500"
+                  : "text-muted-foreground hover:text-foreground border-transparent"
+              }`
+            }
+          >
             Dashboard
-          </Link>
-          <Link to="/applications" className="text-muted-foreground hover:text-foreground transition-colors mx-[20px]">
+          </NavLink>
+          <NavLink
+            to="/applications"
+            className={({ isActive }) =>
+              `transition-colors mx-[20px] border-b-2 ${
+                isActive
+                  ? "font-bold text-foreground border-blue-500"
+                  : "text-muted-foreground hover:text-foreground border-transparent"
+              }`
+            }
+          >
             Applications
-          </Link>
-          <Link to="/generate-resume" className="text-muted-foreground hover:text-foreground transition-colors">
+          </NavLink>
+          <NavLink
+            to="/generate-resume"
+            className={({ isActive }) =>
+              `transition-colors border-b-2 ${
+                isActive
+                  ? "font-bold text-foreground border-blue-500"
+                  : "text-muted-foreground hover:text-foreground border-transparent"
+              }`
+            }
+          >
             Generate Resume
-          </Link>
-          
+          </NavLink>
         </div>
 
         <div className="flex items-center space-x-4">
@@ -44,9 +69,36 @@ const Navigation = () => {
                   
                 </SheetHeader>
                 <nav className="flex flex-col divide-y">
-                  <Link to="/dashboard" className="px-6 py-4 hover:bg-accent hover:text-accent-foreground">Dashboard</Link>
-                  <Link to="/applications" className="px-6 py-4 hover:bg-accent hover:text-accent-foreground">Applications</Link>
-                  <Link to="/generate-resume" className="px-6 py-4 hover:bg-accent hover:text-accent-foreground">Generate Resume</Link>
+                  <NavLink
+                    to="/dashboard"
+                    className={({ isActive }) =>
+                      `px-6 py-4 hover:bg-accent hover:text-accent-foreground border-b-2 ${
+                        isActive ? "font-bold border-blue-500" : "border-transparent"
+                      }`
+                    }
+                  >
+                    Dashboard
+                  </NavLink>
+                  <NavLink
+                    to="/applications"
+                    className={({ isActive }) =>
+                      `px-6 py-4 hover:bg-accent hover:text-accent-foreground border-b-2 ${
+                        isActive ? "font-bold border-blue-500" : "border-transparent"
+                      }`
+                    }
+                  >
+                    Applications
+                  </NavLink>
+                  <NavLink
+                    to="/generate-resume"
+                    className={({ isActive }) =>
+                      `px-6 py-4 hover:bg-accent hover:text-accent-foreground border-b-2 ${
+                        isActive ? "font-bold border-blue-500" : "border-transparent"
+                      }`
+                    }
+                  >
+                    Generate Resume
+                  </NavLink>
                   <Link to="/login" className="px-6 py-4 hover:bg-accent hover:text-accent-foreground">Sign In</Link>
                 </nav>
               </SheetContent>
