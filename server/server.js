@@ -2,20 +2,39 @@
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const axios = require('axios');
+const cors = require("cors");
 require("dotenv").config();
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const express = require('express')
 const router = require('../server/Routes/logRegRoute');
 const linkedinRoutes = require("../server/Routes/linkedin")
 const app = express();
+const cookieParser = require('cookie-parser');
 const port = 3000;
+const {authenticate} = require("../server/middellwares/authenticate");
 app.use(express.json());
+app.use(cookieParser());
 
-
-
+app.use(cors({
+  origin: "http://localhost:8080", // כתובת ה-React שלך
+  credentials: true 
+}));
 
 app.use('/users', router);
 app.use("/auth", linkedinRoutes);
+
+app.get("/auth/check", (req, res) => {
+  const token = req.cookies.token;
+  if (!token) return res.status(401).json({ error: "Not authenticated" });
+
+  try {
+    jwt.verify(token, process.env.JWT_SECRET);
+    res.json({ success: true });
+  } catch {
+    res.status(401).json({ error: "Invalid token" });
+  }
+});
+
 
 
 async function startDB() {

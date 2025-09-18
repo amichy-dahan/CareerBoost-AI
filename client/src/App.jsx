@@ -9,6 +9,7 @@ import DashboardPage from "./pages/DashboardPage";
 import ApplicationsPage from "./features/applications/pages/ApplicationsPage";
 import GenerateResumePage from "./features/resume/pages/GenerateResumePage";
 import NotFound from "./pages/NotFound";
+import ProtectedRoute from "./auth/protectedRoute";
 
 const queryClient = new QueryClient();
 
@@ -21,9 +22,23 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/applications" element={<ApplicationsPage />} />
-          <Route path="/generate-resume" element={<GenerateResumePage />} />
+          <Route path="/dashboard" element={
+            <ProtectedRoute>
+              <DashboardPage />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/applications" element={
+            <ProtectedRoute>
+              <ApplicationsPage />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/generate-resume" element={
+            <ProtectedRoute>
+              <GenerateResumePage />
+            </ProtectedRoute>
+          } />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
