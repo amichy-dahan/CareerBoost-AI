@@ -6,7 +6,9 @@ async function login(email, password) {
     if (!user) {
         throw new Error("User not found");
     }
-
+    if (!user.password) {
+        throw new Error("You probably logged in via LinkedIn, so no password is set");
+    }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
         throw new Error("Invalid credentials");

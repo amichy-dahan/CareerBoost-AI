@@ -16,7 +16,7 @@ const LoginPage = () => {
     email: "",
     password: ""
   });
-    useEffect(() => {
+  useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const errMsg = params.get("error");
     if (errMsg) setError(decodeURIComponent(errMsg));
@@ -33,54 +33,59 @@ const LoginPage = () => {
     console.log("Form submitted:", formData);
   };
 
-  const handlelogin = async (flow) =>{
-     try{
-      if(flow==="Sing in"){
-        const response = await axios.post("http://localhost:3000/users/login",{
-          email:formData.email,
-          password:formData.password
-        },{withCredentials:true});
+  const handlelogin = async (flow) => {
+    try {
+      if (flow === "Sing in") {
+        const response = await axios.post("http://localhost:3000/users/login", {
+          email: formData.email,
+          password: formData.password
+        }, { withCredentials: true });
         console.log(response.data);
         navigate("/dashboard");
-      }else{
-        const response = await axios.post("http://localhost:3000/users/register",{
-          full_name:formData.firstName+" "+formData.lastName,
-          email:formData.email,
-          password:formData.password},{withCredentials:true});
-          console.log(response.data);
-          navigate("/dashboard");
+      } else {
+        const response = await axios.post("http://localhost:3000/users/register", {
+          full_name: formData.firstName + " " + formData.lastName,
+          email: formData.email,
+          password: formData.password
+        }, { withCredentials: true });
+        console.log(response.data);
+        navigate("/dashboard");
       }
-       
-     }catch(error){
-      if(error.response&&error.response.data&&error.response.data.error){
-       alert(error.response.data.error);
-     }
 
-
+    } catch (error) {
+      if (error.response && error.response.data) {
+        if (error.response.data.errors) {
+          alert(error.response.data.errors[0].msg);
+        } else if (error.response.data.error) {
+          alert(error.response.data.error);
+        }
+      } else {
+        alert("Network error");
+      }
+    }
   }
-}
   const handleLinkedIn = async (flow) => {
     try {
       console.log(flow);
       const { data } = await axios.get(`http://localhost:3000/auth/linkedin`, {
         withCredentials: true,
-         params: { flow },
+        params: { flow },
       });
-      
+
       console.log("LinkedIn response:", data);
-     
+
       if (data.url) {
         window.location.href = data.url;
       } else if (data.success) {
         navigate("/dashboard");
       }
     } catch (error) {
-    if (error.response && error.response.data && error.response.data.error) {
-      alert(error.response.data.error); // מציג את השגיאה
-    } else {
-      alert("Unknown error occurred.");
+      if (error.response && error.response.data && error.response.data.error) {
+        alert(error.response.data.error); // מציג את השגיאה
+      } else {
+        alert("Unknown error occurred.");
+      }
     }
-  }
   };
 
   return <div className="min-h-screen bg-background flex px-0 mx-0">
