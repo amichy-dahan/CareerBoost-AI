@@ -6,12 +6,12 @@ async function login(req, res, next) {
     try {
         const { email, password } = req.body;
         const user = await AuthNodel.login(email, password);
-
         const token = jwt.sign(
             { id: user._id, email: user.email },
             process.env.JWT_SECRET,
             { expiresIn: "1h" }
         );
+
         res.cookie("token", token, {
             httpOnly: true,
             // secure: process.env.NODE_ENV === "production",
@@ -21,8 +21,10 @@ async function login(req, res, next) {
 
         res.json({ message: "Logged in successfully", user });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ message: "Server error" });
+        const statusCode = err.status || 500;
+        res.status(statusCode).json({
+            error: err.message || "Server error"
+        });
     }
 }
 
@@ -33,7 +35,10 @@ async function register(req, res, next) {
         res.status(201).json({ message: "User registered successfully", user: newUser });
     } catch (err) {
         console.error(err);
-        res.status(500).json({ message: "Server error" });
+        const statusCode = err.status || 400;
+        res.status(statusCode).json({
+            error: err.message || "Server error"
+        });
     }
 }
 
