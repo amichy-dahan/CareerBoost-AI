@@ -140,10 +140,7 @@ Technologies: React, TypeScript, Tailwind CSS, Vercel`;
       
       <main className="container mx-auto px-4 my-0 py-[71px] pt-32">
         <div className="mb-8 text-center my-[29px]">
-          <br />
-          <br />
-          <br />
-          
+
 
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto mt-4 mb-8"> Fill out your information and let AI craft the perfect resume.</p>
         </div>
