@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import Navigation from "@/components/Navigation";
 import { useApplications } from "../hooks/useApplications.jsx";
 import { FiltersBar } from "../components/FiltersBar";
 import { ApplicationsTable } from "../components/ApplicationsTable";
@@ -71,11 +72,19 @@ const ApplicationsPage = () => {
     });
     setEditingApplication(undefined);
   };
+<<<<<<< HEAD
   return <>
     <Navigation />
     <div className="min-h-screen bg-background pt-16">
       {/* Header */}
       <div className="border-b bg-card">
+=======
+  return <div className="min-h-screen bg-background">
+      <Navigation />
+      <div className="pt-24"> {/* Account for fixed navigation */}
+        {/* Header */}
+        <div className="border-b bg-card">
+>>>>>>> 478743bff9113906eddd9475125b5dd8f5334c2b
         <div className="container mx-auto px-6 py-8">
           <br />
           <br />
@@ -119,9 +128,16 @@ const ApplicationsPage = () => {
           </div>}
       </div>
 
+<<<<<<< HEAD
       {/* Add/Edit Drawer */}
       <ApplicationDrawer application={editingApplication} open={drawerOpen} onOpenChange={setDrawerOpen} onSave={handleSaveApplication} />
     </div>
   </>;
+=======
+        {/* Add/Edit Drawer */}
+        <ApplicationDrawer application={editingApplication} open={drawerOpen} onOpenChange={setDrawerOpen} onSave={handleSaveApplication} />
+      </div>
+    </div>;
+>>>>>>> 478743bff9113906eddd9475125b5dd8f5334c2b
 };
 export default ApplicationsPage;

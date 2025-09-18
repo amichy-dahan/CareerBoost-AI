@@ -25,6 +25,12 @@ export default function GenerateResumePage() {
     resolver: zodResolver(GenerateResumeSchema),
     defaultValues: {
       targetRole: "",
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      address: "",
+      jobTitle: "",
       skills: [""],
       education: [{
         institution: "",
@@ -163,6 +169,45 @@ Technologies: React, TypeScript, Tailwind CSS, Vercel`;
 
               <Separator />
 
+              {/* Personal Info */}
+              <div className="space-y-4">
+                <Label className="text-sm font-medium">1. Personal Info</Label>
+                <div className="grid gap-6 md:grid-cols-2">
+                  <div className="mb-4">
+                    <Label htmlFor="firstName" className="text-xs text-muted-foreground">First Name *</Label>
+                    <Input id="firstName" {...register("firstName")} placeholder="John" className="mt-2" />
+                    {errors.firstName && <p className="text-xs text-destructive mt-1">{errors.firstName.message}</p>}
+                  </div>
+                  <div className="mb-4">
+                    <Label htmlFor="lastName" className="text-xs text-muted-foreground">Last Name *</Label>
+                    <Input id="lastName" {...register("lastName")} placeholder="Doe" className="mt-2" />
+                    {errors.lastName && <p className="text-xs text-destructive mt-1">{errors.lastName.message}</p>}
+                  </div>
+                  <div className="mb-4">
+                    <Label htmlFor="email" className="text-xs text-muted-foreground">Email *</Label>
+                    <Input id="email" {...register("email")} placeholder="john.doe@email.com" type="email" className="mt-2" />
+                    {errors.email && <p className="text-xs text-destructive mt-1">{errors.email.message}</p>}
+                  </div>
+                  <div className="mb-4">
+                    <Label htmlFor="phone" className="text-xs text-muted-foreground">Phone *</Label>
+                    <Input id="phone" {...register("phone")} placeholder="(555) 123-4567" className="mt-2" />
+                    {errors.phone && <p className="text-xs text-destructive mt-1">{errors.phone.message}</p>}
+                  </div>
+                  <div className="mb-4">
+                    <Label htmlFor="address" className="text-xs text-muted-foreground">Address *</Label>
+                    <Input id="address" {...register("address")} placeholder="San Francisco, CA" className="mt-2" />
+                    {errors.address && <p className="text-xs text-destructive mt-1">{errors.address.message}</p>}
+                  </div>
+                  <div className="mb-4">
+                    <Label htmlFor="jobTitle" className="text-xs text-muted-foreground">Job Title *</Label>
+                    <Input id="jobTitle" {...register("jobTitle")} placeholder="Software Developer" className="mt-2" />
+                    {errors.jobTitle && <p className="text-xs text-destructive mt-1">{errors.jobTitle.message}</p>}
+                  </div>
+                </div>
+              </div>
+
+              <Separator />
+
               {/* Skills - Simplified */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -209,26 +254,26 @@ Technologies: React, TypeScript, Tailwind CSS, Vercel`;
                             </Button>}
                         </div>
                       </CardHeader>
-                      <CardContent className="space-y-3">
-                        <div className="grid gap-3 md:grid-cols-2">
-                          <div>
-                            <Label className="text-xs text-muted-foreground">Institution *</Label>
-                            <Input {...register(`education.${index}.institution`)} placeholder="University of Example" />
-                          </div>
-                          <div className="mx-[9px]">
-                            <Label className="text-xs text-muted-foreground">Degree *</Label>
-                            <Input {...register(`education.${index}.degree`)} placeholder="Bachelor of Computer Science" />
-                          </div>
-                          <div>
-                            <Label className="text-xs text-muted-foreground">Start Date</Label>
-                            <Input {...register(`education.${index}.start`)} placeholder="Sep 2020" />
-                          </div>
-                          <div className="mx-[11px]">
-                            <Label className="text-xs text-muted-foreground">End Date</Label>
-                            <Input {...register(`education.${index}.end`)} placeholder="Present or Jun 2024" />
-                          </div>
-                        </div>
-                      </CardContent>
+                       <CardContent className="space-y-3">
+                         <div className="grid gap-6 md:grid-cols-2">
+                           <div className="mb-4">
+                             <Label className="text-xs text-muted-foreground">Institution *</Label>
+                             <Input {...register(`education.${index}.institution`)} placeholder="University of Example" className="mt-2" />
+                           </div>
+                           <div className="mb-4">
+                             <Label className="text-xs text-muted-foreground">Degree *</Label>
+                             <Input {...register(`education.${index}.degree`)} placeholder="Bachelor of Computer Science" className="mt-2" />
+                           </div>
+                           <div className="mb-4">
+                             <Label className="text-xs text-muted-foreground">Start Date</Label>
+                             <Input {...register(`education.${index}.start`)} placeholder="Sep 2020" className="mt-2" />
+                           </div>
+                           <div className="mb-4">
+                             <Label className="text-xs text-muted-foreground">End Date</Label>
+                             <Input {...register(`education.${index}.end`)} placeholder="Present or Jun 2024" className="mt-2" />
+                           </div>
+                         </div>
+                       </CardContent>
                     </Card>)}
                 </div>
                 <Separator />
@@ -258,40 +303,40 @@ Technologies: React, TypeScript, Tailwind CSS, Vercel`;
                             </Button>}
                         </div>
                       </CardHeader>
-                      <CardContent className="space-y-4">
-                        <div className="grid gap-3 md:grid-cols-2">
-                          <div>
-                            <Label className="text-xs text-muted-foreground">Company *</Label>
-                            <Input {...register(`experience.${index}.company`)} placeholder="Tech Company Inc." />
-                          </div>
-                          <div>
-                            <Label className="text-xs text-muted-foreground">Job Title *</Label>
-                            <Input {...register(`experience.${index}.title`)} placeholder="Software Developer Intern" />
-                          </div>
-                          <div>
-                            <Label className="text-xs text-muted-foreground">Location</Label>
-                            <Input {...register(`experience.${index}.location`)} placeholder="San Francisco, CA" />
-                          </div>
-                          <div className="grid grid-cols-2 gap-2">
-                            <div>
-                              <Label className="text-xs text-muted-foreground">Start</Label>
-                              <Input {...register(`experience.${index}.start`)} placeholder="Jun 2023" />
-                            </div>
-                            <div>
-                              <Label className="text-xs text-muted-foreground">End</Label>
-                              <Input {...register(`experience.${index}.end`)} placeholder="Present" />
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-3">
-                          <Label className="text-xs text-muted-foreground">Key Achievements *</Label>
-                          <Textarea {...register(`experience.${index}.bullets.0`)} placeholder="• Developed responsive web applications using React and TypeScript, improving user engagement by 25%&#10;• Collaborated with cross-functional teams to implement new features, reducing development time by 30%&#10;• Optimized database queries and API endpoints, improving application performance by 40%" className="min-h-[100px]" />
-                          <p className="text-xs text-muted-foreground my-[20px]">
-                            Tip: Use action verbs + quantified results (numbers, percentages, metrics)
-                          </p>
-                        </div>
-                      </CardContent>
+                       <CardContent className="space-y-4">
+                         <div className="grid gap-6 md:grid-cols-2">
+                           <div className="mb-4">
+                             <Label className="text-xs text-muted-foreground">Company *</Label>
+                             <Input {...register(`experience.${index}.company`)} placeholder="Tech Company Inc." className="mt-2" />
+                           </div>
+                           <div className="mb-4">
+                             <Label className="text-xs text-muted-foreground">Job Title *</Label>
+                             <Input {...register(`experience.${index}.title`)} placeholder="Software Developer Intern" className="mt-2" />
+                           </div>
+                           <div className="mb-4">
+                             <Label className="text-xs text-muted-foreground">Location</Label>
+                             <Input {...register(`experience.${index}.location`)} placeholder="San Francisco, CA" className="mt-2" />
+                           </div>
+                           <div className="grid grid-cols-2 gap-4 mb-4">
+                             <div>
+                               <Label className="text-xs text-muted-foreground">Start</Label>
+                               <Input {...register(`experience.${index}.start`)} placeholder="Jun 2023" className="mt-2" />
+                             </div>
+                             <div>
+                               <Label className="text-xs text-muted-foreground">End</Label>
+                               <Input {...register(`experience.${index}.end`)} placeholder="Present" className="mt-2" />
+                             </div>
+                           </div>
+                         </div>
+                         
+                         <div className="space-y-3">
+                           <Label className="text-xs text-muted-foreground">Key Achievements *</Label>
+                           <Textarea {...register(`experience.${index}.bullets.0`)} placeholder="• Developed responsive web applications using React and TypeScript, improving user engagement by 25%&#10;• Collaborated with cross-functional teams to implement new features, reducing development time by 30%&#10;• Optimized database queries and API endpoints, improving application performance by 40%" className="min-h-[100px] mt-2" />
+                           <p className="text-xs text-muted-foreground my-[20px]">
+                             Tip: Use action verbs + quantified results (numbers, percentages, metrics)
+                           </p>
+                         </div>
+                       </CardContent>
                     </Card>)}
                 </div>
                 <Separator />
