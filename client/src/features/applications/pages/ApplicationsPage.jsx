@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
@@ -12,6 +12,8 @@ const ApplicationsPage = () => {
   const [page, setPage] = useState(1);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editingApplication, setEditingApplication] = useState(undefined);
+  // Local rows state for immediate UI updates
+  const [rows, setRows] = useState([]);
   const {
     toast
   } = useToast();
@@ -19,6 +21,13 @@ const ApplicationsPage = () => {
     data,
     isLoading
   } = useApplications(filters, page, 20);
+
+  // Keep local rows in sync with fetched data
+  useEffect(() => {
+    if (data?.items) {
+      setRows(data.items);
+    }
+  }, [data]);
   const handleExport = () => {
     // Mock CSV export
     const csvContent = ['Company,Role,Status,Applied Date,Match Score,Technologies', ...data.items.map(app => `"${app.company}","${app.roleTitle}","${app.status}","${app.appliedAt || ''}","${app.matchScore || ''}","${app.technologies.join('; ')}"`)].join('\n');
@@ -45,7 +54,8 @@ const ApplicationsPage = () => {
     setDrawerOpen(true);
   };
   const handleDeleteApplication = applicationId => {
-    // Mock delete
+    // Remove from local state for immediate UI update
+    setRows(prev => prev.filter(r => r.id !== applicationId));
     toast({
       title: "Application deleted",
       description: "The application has been removed from your list"
@@ -63,13 +73,31 @@ const ApplicationsPage = () => {
     setDrawerOpen(true);
   };
   const handleSaveApplication = applicationData => {
-    // Mock save
+    // Update local table state for immediate feedback
+    setRows(prev => {
+      if (editingApplication?.id) {
+        // Update existing row
+        return prev.map(r => (r.id === editingApplication.id ? { ...r, ...applicationData } : r));
+      }
+      // Add new row with a temporary id
+      const newItem = {
+        id: String(Date.now()),
+        status: 'Draft',
+        appliedAt: '',
+        technologies: [],
+        ...applicationData,
+      };
+      return [newItem, ...prev];
+    });
+
     const isEditing = Boolean(editingApplication?.id);
     toast({
       title: isEditing ? "Application updated" : "Application added",
       description: `${applicationData.company} - ${applicationData.roleTitle} has been ${isEditing ? 'updated' : 'added'}`
     });
+
     setEditingApplication(undefined);
+    setDrawerOpen(false);
   };
   return (
     <div className="min-h-screen bg-background">
@@ -108,7 +136,7 @@ const ApplicationsPage = () => {
             </div>
           ) : (
             <ApplicationsTable
-              applications={data.items}
+              applications={rows}
               onEdit={handleEditApplication}
               onDelete={handleDeleteApplication}
               onDuplicate={handleDuplicateApplication}
