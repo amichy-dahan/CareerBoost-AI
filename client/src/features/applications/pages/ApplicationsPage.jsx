@@ -129,7 +129,7 @@ const ApplicationsPage = () => {
         <FiltersBar filters={filters} onFiltersChange={setFilters} onExport={handleExport} totalResults={data.total} />
 
         {/* Table */}
-        <div className="container py-6 mx-0 px-[24px] my-0">
+  <div className="container mx-auto px-6 py-6">
           {isLoading ? (
             <div className="text-center py-12">
               <div className="text-lg">Loading applications...</div>

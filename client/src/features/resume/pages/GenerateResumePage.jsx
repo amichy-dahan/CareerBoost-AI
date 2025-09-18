@@ -160,8 +160,13 @@ Technologies: React, TypeScript, Tailwind CSS, Vercel`;
             <CardContent className="space-y-6">
               {/* Target Role */}
               <div className="space-y-2">
-                <Label htmlFor="targetRole" className="text-sm font-medium">Target Job (Optional)</Label>
-                <Input id="targetRole" {...register("targetRole")} placeholder="e.g., Junior Frontend Developer" className="w-full" />
+                <Label htmlFor="targetRole" className="text-sm font-medium">Target Job Description (Optional)</Label>
+                <Textarea
+                  id="targetRole"
+                  {...register("targetRole")}
+                  placeholder="Paste the job description or keywords here (multi-line)"
+                  className="w-full min-h-[120px]"
+                />
                 <p className="text-xs text-muted-foreground">
                   Helps tailor keywords and focus for your resume
                 </p>
