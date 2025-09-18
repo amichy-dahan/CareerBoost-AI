@@ -7,7 +7,6 @@ import { useApplications } from "../hooks/useApplications.jsx";
 import { FiltersBar } from "../components/FiltersBar";
 import { ApplicationsTable } from "../components/ApplicationsTable";
 import { ApplicationDrawer } from "../components/ApplicationDrawer";
-import Navigation from "@/components/Navigation.jsx";
 const ApplicationsPage = () => {
   const [filters, setFilters] = useState({});
   const [page, setPage] = useState(1);
@@ -72,20 +71,13 @@ const ApplicationsPage = () => {
     });
     setEditingApplication(undefined);
   };
-<<<<<<< HEAD
-  return <>
-    <Navigation />
-    <div className="min-h-screen bg-background pt-16">
-      {/* Header */}
-      <div className="border-b bg-card">
-=======
-  return <div className="min-h-screen bg-background">
+  return (
+    <div className="min-h-screen bg-background">
       <Navigation />
       <div className="pt-24"> {/* Account for fixed navigation */}
         {/* Header */}
         <div className="border-b bg-card">
->>>>>>> 478743bff9113906eddd9475125b5dd8f5334c2b
-        <div className="container mx-auto px-6 py-8">
+          <div className="container mx-auto px-6 py-8">
           <br />
           <br />
           <br />
@@ -101,43 +93,57 @@ const ApplicationsPage = () => {
               <Plus className="h-5 w-5" />
               Add Application
             </Button>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Filters */}
-      <FiltersBar filters={filters} onFiltersChange={setFilters} onExport={handleExport} totalResults={data.total} />
+        {/* Filters */}
+        <FiltersBar filters={filters} onFiltersChange={setFilters} onExport={handleExport} totalResults={data.total} />
 
-      {/* Table */}
-      <div className="container py-6 mx-0 px-[24px] my-0">
-        {isLoading ? <div className="text-center py-12">
-            <div className="text-lg">Loading applications...</div>
-          </div> : <ApplicationsTable applications={data.items} onEdit={handleEditApplication} onDelete={handleDeleteApplication} onDuplicate={handleDuplicateApplication} />}
+        {/* Table */}
+        <div className="container py-6 mx-0 px-[24px] my-0">
+          {isLoading ? (
+            <div className="text-center py-12">
+              <div className="text-lg">Loading applications...</div>
+            </div>
+          ) : (
+            <ApplicationsTable
+              applications={data.items}
+              onEdit={handleEditApplication}
+              onDelete={handleDeleteApplication}
+              onDuplicate={handleDuplicateApplication}
+            />
+          )}
 
-        {/* Pagination */}
-        {data.total > 20 && <div className="flex items-center justify-center gap-4 mt-8">
-            <Button variant="outline" disabled={page === 1} onClick={() => setPage(page - 1)}>
-              Previous
-            </Button>
-            <span className="text-sm text-muted-foreground">
-              Page {page} of {Math.ceil(data.total / 20)}
-            </span>
-            <Button variant="outline" disabled={page >= Math.ceil(data.total / 20)} onClick={() => setPage(page + 1)}>
-              Next
-            </Button>
-          </div>}
-      </div>
+          {/* Pagination */}
+          {data.total > 20 && (
+            <div className="flex items-center justify-center gap-4 mt-8">
+              <Button variant="outline" disabled={page === 1} onClick={() => setPage(page - 1)}>
+                Previous
+              </Button>
+              <span className="text-sm text-muted-foreground">
+                Page {page} of {Math.ceil(data.total / 20)}
+              </span>
+              <Button
+                variant="outline"
+                disabled={page >= Math.ceil(data.total / 20)}
+                onClick={() => setPage(page + 1)}
+              >
+                Next
+              </Button>
+            </div>
+          )}
+        </div>
 
-<<<<<<< HEAD
-      {/* Add/Edit Drawer */}
-      <ApplicationDrawer application={editingApplication} open={drawerOpen} onOpenChange={setDrawerOpen} onSave={handleSaveApplication} />
-    </div>
-  </>;
-=======
         {/* Add/Edit Drawer */}
-        <ApplicationDrawer application={editingApplication} open={drawerOpen} onOpenChange={setDrawerOpen} onSave={handleSaveApplication} />
+        <ApplicationDrawer
+          application={editingApplication}
+          open={drawerOpen}
+          onOpenChange={setDrawerOpen}
+          onSave={handleSaveApplication}
+        />
       </div>
-    </div>;
->>>>>>> 478743bff9113906eddd9475125b5dd8f5334c2b
+    </div>
+  );
 };
 export default ApplicationsPage;
