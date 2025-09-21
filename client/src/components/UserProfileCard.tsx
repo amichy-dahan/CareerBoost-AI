@@ -2,38 +2,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ExternalLink } from "lucide-react";
-<<<<<<< HEAD
-import { useEffect, useState } from "react";
-import axios from "axios";
-const serverUrl = import.meta.env.VITE_SERVER_URL;
-
-
-const UserProfileCard = () => {
-  // Mock data - in real app this would come from LinkedIn API or local storage
-  const [userProfile, setUserProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const response = await axios.get(`${serverUrl}/users/me`, {
-          withCredentials: true
-        });
-        setUserProfile(response.data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserProfile();
-  }, []);
-
-  if (loading) return <p>Loading...</p>;
-  if (!userProfile) return <p>User not found</p>;
-
-=======
 
 const UserProfileCard = () => {
   // Mock data - in real app this would come from LinkedIn API or local storage
@@ -43,7 +11,6 @@ const UserProfileCard = () => {
     profileImage: "/api/placeholder/120/120", // placeholder image
     initials: "AJ"
   };
->>>>>>> parent of 9025c42 (changes)
 
   return (
     <Card className="w-full">
