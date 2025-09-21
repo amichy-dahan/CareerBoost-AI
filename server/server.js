@@ -14,9 +14,9 @@ const cookieParser = require('cookie-parser');
 
 app.use(express.json());
 app.use(cookieParser());
-
+// process.env.PROD === "true"? `https://careerboost-ai-1.onrender.com`:`http://localhost:${process.env.PORT}`,
 app.use(cors({
-  origin: `https://careerboost-ai-1.onrender.com`, // כתובת ה-React שלך
+  origin:`https://careerboost-ai-1.onrender.com`,
   credentials: true 
 }));
 
@@ -25,6 +25,7 @@ app.use("/auth", linkedinRoutes);
 
 app.get("/auth/check", (req, res) => {
   const token = req.cookies.token;
+  console.log(token);
   if (!token) return res.status(401).json({ error: "Not authenticated" });
 
   try {
