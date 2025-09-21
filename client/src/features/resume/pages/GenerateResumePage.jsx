@@ -125,7 +125,7 @@ Technologies: React, TypeScript, Tailwind CSS, Vercel`;
         variant: "destructive"
       });
     } finally {
-      setIsGenerating(false); 
+      setIsGenerating(false);
     }
   }
   const copyToClipboard = () => {
@@ -138,11 +138,11 @@ Technologies: React, TypeScript, Tailwind CSS, Vercel`;
   return <div className="min-h-screen bg-background">
       <Navigation />
       
-      <main className="container mx-auto px-4 my-0 py-[71px] pt-32">
+      <main className="container mx-auto px-4 my-0 py-[71px]">
         <div className="mb-8 text-center my-[29px]">
-
-
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto mt-4 mb-8"> Fill out your information and let AI craft the perfect resume.</p>
+          <h1 className="text-4xl font-bold bg-gradient-to-r from-primary via-primary-glow to-success bg-clip-text text-transparent mb-4">
+        </h1>
+          <p className="text-lg text-muted-foreground max-w-2xl mx-auto"> Fill out your information and let AI craft the perfect resume.</p>
         </div>
 
         <div className="grid gap-8 lg:grid-cols-2 my-0 py-0">
@@ -157,13 +157,8 @@ Technologies: React, TypeScript, Tailwind CSS, Vercel`;
             <CardContent className="space-y-6">
               {/* Target Role */}
               <div className="space-y-2">
-                <Label htmlFor="targetRole" className="text-sm font-medium">Target Job Description (Optional)</Label>
-                <Textarea
-                  id="targetRole"
-                  {...register("targetRole")}
-                  placeholder="Paste the job description or keywords here (multi-line)"
-                  className="w-full min-h-[120px]"
-                />
+                <Label htmlFor="targetRole" className="text-sm font-medium">Target Job (Optional)</Label>
+                <Input id="targetRole" {...register("targetRole")} placeholder="e.g., Junior Frontend Developer" className="w-full" />
                 <p className="text-xs text-muted-foreground">
                   Helps tailor keywords and focus for your resume
                 </p>

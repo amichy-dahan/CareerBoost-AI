@@ -128,7 +128,9 @@ const Dashboard = () => {
   return <section id="dashboard" className="px-6 bg-muted/20 py-[55px]">
       <div className="container mx-auto max-w-6xl">
         <div className="text-center mb-16 my-[15px]">
-   
+          <Badge variant="outline" className="mb-4">Dashboard Preview</Badge>
+          
+          
         </div>
 
         <div className="grid lg:grid-cols-3 gap-8">

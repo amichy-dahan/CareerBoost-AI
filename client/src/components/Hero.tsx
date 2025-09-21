@@ -1,12 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, CheckCircle, Upload, Github, Linkedin } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 const Hero = () => {
-  const navigate = useNavigate();
-
-  function handleNav(){
-    navigate("/login");
-  }
   return <section className="pt-24 pb-16 px-6 bg-gradient-to-b from-background to-muted/20">
       <div className="container mx-auto max-w-6xl">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -26,7 +20,7 @@ const Hero = () => {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button onClick={handleNav} size="lg" className="bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 transition-opacity">
+              <Button size="lg" className="bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 transition-opacity">
                 Start Free Analysis
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
