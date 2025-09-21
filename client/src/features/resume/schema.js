@@ -20,12 +20,6 @@ export const ExperienceItemSchema = z.object({
 
 export const GenerateResumeSchema = z.object({
   targetRole: z.string().optional(),
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  email: z.string().email("Valid email is required"),
-  phone: z.string().min(1, "Phone number is required"),
-  address: z.string().min(1, "Address is required"),
-  jobTitle: z.string().min(1, "Job title is required"),
   skills: z.array(z.string()).min(1, "Add at least one skill"),
   education: z.array(EducationItemSchema).min(1, "Add at least one education item"),
   experience: z.array(ExperienceItemSchema).min(1, "Add at least one experience item"),

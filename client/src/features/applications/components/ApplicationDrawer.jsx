@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -41,27 +41,6 @@ export const ApplicationDrawer = ({ application, open, onOpenChange, onSave }) =
     offerComp: application?.offerComp || '',
     rejectionReason: application?.rejectionReason || '',
   });
-
-  // Reset form when switching between add/edit or when a different application is selected
-  useEffect(() => {
-    setFormData({
-      company: application?.company || '',
-      roleTitle: application?.roleTitle || '',
-      location: application?.location || '',
-      source: application?.source || 'LinkedIn',
-      jobUrl: application?.jobUrl || '',
-      resumeId: application?.resumeId || '',
-      status: application?.status || 'Draft',
-      appliedAt: application?.appliedAt || '',
-      nextAction: application?.nextAction || '',
-      nextActionDate: application?.nextActionDate || '',
-      matchScore: application?.matchScore || undefined,
-      tailoringNotes: application?.tailoringNotes || '',
-      technologies: application?.technologies || [],
-      offerComp: application?.offerComp || '',
-      rejectionReason: application?.rejectionReason || '',
-    });
-  }, [application, open]);
 
   const [newTech, setNewTech] = useState('');
 
