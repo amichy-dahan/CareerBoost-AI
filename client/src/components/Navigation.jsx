@@ -6,9 +6,9 @@ const Navigation = () => {
       <div className="container h-16 flex items-center justify-between px-[26px] mx-px py-[10px] my-0">
         <div className="flex items-center space-x-2">
           <div className="w-8 h-8 bg-gradient-to-br from-primary to-primary-glow rounded-lg flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-sm">CBA</span>
+            <span className="text-primary-foreground font-bold text-sm">In.d</span>
           </div>
-          <span className="text-xl font-bold text-slate-950">CareerBoost AI </span>
+          <span className="text-xl font-bold text-slate-950">BreakIn.dev</span>
         </div>
         
         <div className="hidden md:flex items-center space-x-8">
@@ -18,23 +18,8 @@ const Navigation = () => {
           </Link>
           <Link to="/applications" className="text-muted-foreground hover:text-foreground transition-colors mx-[20px]">
             Applications
-<<<<<<< HEAD
           </Link>
           <Link to="/generate-resume" className="text-muted-foreground hover:text-foreground transition-colors">
-=======
-
-          </NavLink>
-          <NavLink
-            to="/resume"
-            className={({ isActive }) =>
-              `transition-colors border-b-2 ${
-                isActive
-                  ? "font-bold text-foreground border-blue-500"
-                  : "text-muted-foreground hover:text-foreground border-transparent"
-              }`
-            }
-          >
->>>>>>> 1b32d940e3e51586f5e349ecf1f95a40850e1774
             Generate Resume
           </Link>
           

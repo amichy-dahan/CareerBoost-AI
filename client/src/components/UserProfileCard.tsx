@@ -2,13 +2,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ExternalLink } from "lucide-react";
-import { useEffect, useState } from "react";
-import axios from "axios";
-
 
 const UserProfileCard = () => {
   // Mock data - in real app this would come from LinkedIn API or local storage
-<<<<<<< HEAD
   const userProfile = {
     fullName: "Alex Johnson",
     title: "Junior Frontend Developer",
@@ -16,31 +12,6 @@ const UserProfileCard = () => {
     linkedInUrl: "https://linkedin.com/in/alexjohnson",
     initials: "AJ"
   };
-=======
-  const [userProfile, setUserProfile] = useState(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchUserProfile = async () => {
-      try {
-        const response = await axios.get("http://localhost:3000/users/me", {
-          withCredentials: true
-        });
-        setUserProfile(response.data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUserProfile();
-  }, []);
-
-  if (loading) return <p>Loading...</p>;
-  if (!userProfile) return <p>User not found</p>;
-
->>>>>>> 1b32d940e3e51586f5e349ecf1f95a40850e1774
 
   return (
     <Card className="w-full">
@@ -49,16 +20,12 @@ const UserProfileCard = () => {
           {/* Left section: Avatar and info */}
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
             <Avatar className="h-16 w-16 sm:h-12 sm:w-12">
-<<<<<<< HEAD
               <AvatarImage src={userProfile.profileImage} alt={userProfile.fullName} />
-=======
-
->>>>>>> 1b32d940e3e51586f5e349ecf1f95a40850e1774
               <AvatarFallback className="text-lg sm:text-sm bg-primary text-primary-foreground">
                 {userProfile.initials}
               </AvatarFallback>
             </Avatar>
-
+            
             <div className="text-center sm:text-left">
               <h3 className="font-semibold text-lg sm:text-base leading-tight">
                 {userProfile.fullName}
@@ -70,7 +37,6 @@ const UserProfileCard = () => {
           </div>
 
           {/* Right section: LinkedIn button */}
-<<<<<<< HEAD
           <Button 
             variant="outline" 
             size="sm" 
@@ -83,9 +49,6 @@ const UserProfileCard = () => {
             LinkedIn
             <ExternalLink className="w-3 h-3" />
           </Button>
-=======
-
->>>>>>> 1b32d940e3e51586f5e349ecf1f95a40850e1774
         </div>
       </CardContent>
     </Card>
