@@ -4,7 +4,7 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ExternalLink } from "lucide-react";
 import { useEffect, useState } from "react";
 import axios from "axios";
-
+const serverUrl = import.meta.env.REACT_APP_SERVER_URI;
 
 const UserProfileCard = () => {
   // Mock data - in real app this would come from LinkedIn API or local storage
@@ -14,7 +14,7 @@ const UserProfileCard = () => {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/users/me", {
+        const response = await axios.get(`${serverUrl}/users/me`, {
           withCredentials: true
         });
         setUserProfile(response.data);
