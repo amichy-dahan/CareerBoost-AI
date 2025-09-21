@@ -41,6 +41,10 @@ app.get("/",(req, res)=>{
 
   res.send("hello word career boost");
 })
+app.get("/logout", (req, res) => {
+  res.cookie("token", "", { httpOnly: true, secure: true, sameSite: "none", maxAge: 0 });
+  res.redirect("/login");
+});
 
 const feedbackRouter = require("./Routes/feedback");
 app.use("/api/feedback", feedbackRouter);
