@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 require("dotenv").config();
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const axios = require('axios');
-const serverUrl = `https://careerboost-ai-al0j.onrender.com`;
+const serverUrl = `https://careerboost-ai-1.onrender.com`;
 const REDIRECT_URI = `${serverUrl}/auth/linkedin/callback`;
 const User = require("../models/User");
 
