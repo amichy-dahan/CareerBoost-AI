@@ -19,7 +19,7 @@ const Navigation = () => {
           <Link to="/applications" className="text-muted-foreground hover:text-foreground transition-colors mx-[20px]">
             Applications
           </Link>
-          <Link to="/generate-resume" className="text-muted-foreground hover:text-foreground transition-colors">
+          <Link to="/resume" className="text-muted-foreground hover:text-foreground transition-colors">
             Generate Resume
           </Link>
           

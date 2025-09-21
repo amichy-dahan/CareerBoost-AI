@@ -35,6 +35,9 @@ app.get("/auth/check", (req, res) => {
   }
 });
 
+const feedbackRouter = require("./Routes/feedback");
+app.use("/api/feedback", feedbackRouter);
+
 
 
 async function startDB() {
