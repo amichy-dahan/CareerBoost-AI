@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use(cors({
-  origin: process.env.REACT_APP_SERVER_URI, // כתובת ה-React שלך
+  origin: process.env.VITE_SERVER_URL, // כתובת ה-React שלך
   credentials: true 
 }));
 
