@@ -5,7 +5,8 @@ const jwt = require('jsonwebtoken');
 require("dotenv").config();
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const axios = require('axios');
-const REDIRECT_URI = "http://localhost:3000/auth/linkedin/callback";
+const serverUrl = `https://careerboost-ai-al0j.onrender.com`;
+const REDIRECT_URI = `${serverUrl}/auth/linkedin/callback`;
 const User = require("../models/User");
 
 
@@ -58,11 +59,11 @@ linkedinRoutes.get("/linkedin/callback", async (req, res) => {
 
         if (flow === "login") {
             if (!user) {
-                return res.redirect(`http://localhost:8080/login?error=${encodeURIComponent("User not registered. Please register first.")}`);
+                return res.redirect(`https://careerboost-ai-1.onrender.com/login?error=${encodeURIComponent("User not registered. Please register first.")}`);
             }
         } else if (flow === "register") {
             if (user) {
-                return res.redirect(`http://localhost:8080/login?error=${encodeURIComponent("User already exists. Please login.")}`);
+                return res.redirect(`https://careerboost-ai-1.onrender.com/login?error=${encodeURIComponent("User already exists. Please login.")}`);
 
             }
             user = await User.create({
@@ -89,7 +90,7 @@ linkedinRoutes.get("/linkedin/callback", async (req, res) => {
         });
 
         // Redirect ל-frontend
-        res.redirect("http://localhost:8080/dashboard");
+        res.redirect("https://careerboost-ai-1.onrender.com/dashboard");
 
 
     } catch (err) {
