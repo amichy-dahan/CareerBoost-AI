@@ -8,8 +8,9 @@ function ProtectedRoute({ children }) {
 
   useEffect(() => {
     const checkAuth = async () => {
+
       try {
-        // שולחים בקשה ל-server לבדוק אם הטוקן תקין
+        
         await axios.get("https://careerboost-ai-al0j.onrender.com/auth/check", { withCredentials: true });
         setAuthenticated(true);
       } catch (err) {
