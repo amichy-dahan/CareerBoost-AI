@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use(cors({
-  origin: "http://localhost:8080", // כתובת ה-React שלך
+  origin: process.env.REACT_APP_SERVER_URI, // כתובת ה-React שלך
   credentials: true 
 }));
 
