@@ -84,8 +84,8 @@ linkedinRoutes.get("/linkedin/callback", async (req, res) => {
 
         res.cookie("token", token, {
             httpOnly: true,        // לא נגיש ל-JS בצד לקוח
-            secure: false,         // true אם https
-            sameSite: "lax",       // למניעת בעיות CORS
+            secure: true,
+            sameSite: "none" ,   // למניעת בעיות CORS
             maxAge: 1000 * 60 * 60 // שעה
         });
 
