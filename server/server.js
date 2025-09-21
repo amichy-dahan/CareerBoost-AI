@@ -54,6 +54,9 @@ async function startDB() {
   });
 }
 
+console.log("----------------------------")
+console.log(env.process.FRONTEND_URL)
+console.log("----------------------------")
 startDB();
 
 
