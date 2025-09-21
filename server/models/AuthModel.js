@@ -34,18 +34,8 @@ async function register(full_name, email, password) {
         password: hashedPassword
     });
 
-
-     
     await newUser.save();
     return newUser;
 }
 
-
-async function getMe(userId){
-    const user= await User.findById(userId);
-     if (!user) throw new Error("user not found");
-
-  return user;
-}
-
-module.exports = { login, register , getMe };
+module.exports = { login, register };
