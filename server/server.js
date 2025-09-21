@@ -10,13 +10,13 @@ const router = require('../server/Routes/logRegRoute');
 const linkedinRoutes = require("../server/Routes/linkedin")
 const app = express();
 const cookieParser = require('cookie-parser');
-const port = 3000;
-const {authenticate} = require("../server/middellwares/authenticate");
+
+
 app.use(express.json());
 app.use(cookieParser());
 
 app.use(cors({
-  origin: "http://localhost:8080", // כתובת ה-React שלך
+  origin: process.env.REACT_APP_SERVER_URI, // כתובת ה-React שלך
   credentials: true 
 }));
 
@@ -36,11 +36,21 @@ app.get("/auth/check", (req, res) => {
 });
 
 
+app.get("/",(req, res)=>{
+
+  res.send("hello word career boost");
+})
+
+const feedbackRouter = require("./Routes/feedback");
+app.use("/api/feedback", feedbackRouter);
+
+
+
 
 async function startDB() {
   await mongoose.connect(process.env.MONGO_URI);
-  app.listen(3000, () => {
-    console.log("Server running on http://localhost:3000");
+  app.listen(process.env.PORT, () => {
+    console.log(`Server running on http://localhost:${process.env.PORT}`);
   });
 }
 

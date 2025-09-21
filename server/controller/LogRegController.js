@@ -1,4 +1,5 @@
 
+const { get } = require('mongoose');
 const AuthNodel = require('../models/AuthModel');
 const jwt = require("jsonwebtoken")
 
@@ -42,4 +43,21 @@ async function register(req, res, next) {
     }
 }
 
-module.exports = { login, register }
+
+async function getMe(req, res, next) {
+    try {
+        const userId = req.user.id; // מקבלים מה־JWT, אין צורך לשלוח מהלקוח
+        const user = await AuthNodel.getMe(userId);
+        res.json({
+            fullName: `${user.firstName} ${user.lastName}`,
+            title: user.title || "Job seeker",
+            profileImage: user.profileImage || null,
+            initials: (user.firstName[0] + user.lastName[0]).toUpperCase()
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: "Server error" });
+    }
+}
+
+module.exports = { login, register , getMe }
