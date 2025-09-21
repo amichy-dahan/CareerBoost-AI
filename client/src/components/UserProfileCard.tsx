@@ -4,7 +4,8 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ExternalLink } from "lucide-react";
 import { useEffect, useState } from "react";
 import axios from "axios";
-const serverUrl = import.meta.env.REACT_APP_SERVER_URI;
+const serverUrl = import.meta.env.VITE_SERVER_URL;
+
 
 const UserProfileCard = () => {
   // Mock data - in real app this would come from LinkedIn API or local storage
