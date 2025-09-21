@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use(cors({
-  origin: process.env.VITE_SERVER_URL, // כתובת ה-React שלך
+  origin: `https://careerboost-ai-1.onrender.com`, // כתובת ה-React שלך
   credentials: true 
 }));
 
