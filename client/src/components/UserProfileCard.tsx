@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ExternalLink } from "lucide-react";
+<<<<<<< HEAD
 import { useEffect, useState } from "react";
 import axios from "axios";
 const serverUrl = import.meta.env.VITE_SERVER_URL;
@@ -32,6 +33,17 @@ const UserProfileCard = () => {
   if (loading) return <p>Loading...</p>;
   if (!userProfile) return <p>User not found</p>;
 
+=======
+
+const UserProfileCard = () => {
+  // Mock data - in real app this would come from LinkedIn API or local storage
+  const userProfile = {
+    fullName: "Alex Johnson",
+    title: "job seeker",
+    profileImage: "/api/placeholder/120/120", // placeholder image
+    initials: "AJ"
+  };
+>>>>>>> parent of 9025c42 (changes)
 
   return (
     <Card className="w-full">
@@ -40,12 +52,12 @@ const UserProfileCard = () => {
           {/* Left section: Avatar and info */}
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
             <Avatar className="h-16 w-16 sm:h-12 sm:w-12">
-
+         
               <AvatarFallback className="text-lg sm:text-sm bg-primary text-primary-foreground">
                 {userProfile.initials}
               </AvatarFallback>
             </Avatar>
-
+            
             <div className="text-center sm:text-left">
               <h3 className="font-semibold text-lg sm:text-base leading-tight">
                 {userProfile.fullName}
@@ -57,7 +69,7 @@ const UserProfileCard = () => {
           </div>
 
           {/* Right section: LinkedIn button */}
-
+        
         </div>
       </CardContent>
     </Card>
