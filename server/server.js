@@ -23,17 +23,17 @@ app.use(cors({
 app.use('/users', router);
 app.use("/auth", linkedinRoutes);
 
-// app.get("/auth/check", (req, res) => {
-//   const token = req.cookies.token;
-//   if (!token) return res.status(401).json({ error: "Not authenticated" });
+app.get("/auth/check", (req, res) => {
+  const token = req.cookies.token;
+  if (!token) return res.status(401).json({ error: "Not authenticated" });
 
-//   try {
-//     jwt.verify(token, process.env.JWT_SECRET);
-//     res.json({ success: true });
-//   } catch {
-//     res.status(401).json({ error: "Invalid token" });
-//   }
-// });
+  try {
+    jwt.verify(token, process.env.JWT_SECRET);
+    res.json({ success: true });
+  } catch {
+    res.status(401).json({ error: "Invalid token" });
+  }
+});
 
 
 app.get("/",(req, res)=>{

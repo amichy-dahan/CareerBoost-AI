@@ -10,7 +10,7 @@ function ProtectedRoute({ children }) {
     const checkAuth = async () => {
       try {
         // שולחים בקשה ל-server לבדוק אם הטוקן תקין
-        await axios.get("http://localhost:3000/auth/check", { withCredentials: true });
+        await axios.get("https://careerboost-ai-al0j.onrender.com/auth/check", { withCredentials: true });
         setAuthenticated(true);
       } catch (err) {
         setAuthenticated(false);
