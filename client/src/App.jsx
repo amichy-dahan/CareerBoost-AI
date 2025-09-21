@@ -9,7 +9,7 @@ import DashboardPage from "./pages/DashboardPage";
 import ApplicationsPage from "./features/applications/pages/ApplicationsPage";
 import GenerateResumePage from "./features/resume/pages/GenerateResumePage";
 import NotFound from "./pages/NotFound";
-import ProtectedRoute from "./auth/protectedRoute";
+import ProtectedRoute from "./auth/ProtectedRoute";
 import ResumeHubPage from "@/features/resume/pages/ResumeHubPage";
 import ResumeImproverPage from "@/features/resume/pages/ResumeImproverPage";
 
