@@ -50,6 +50,7 @@ linkedinRoutes.get("/linkedin/callback", async (req, res) => {
 
         const accessToken = tokenResponse.data.access_token;
         const idToken = tokenResponse.data.id_token;
+        console.log(token)
 
 
         const decoded = jwt.decode(idToken);
