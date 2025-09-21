@@ -35,10 +35,15 @@ app.get("/auth/check", (req, res) => {
   }
 });
 
+
 app.get("/",(req, res)=>{
 
   res.send("hello word career boost");
 })
+
+const feedbackRouter = require("./Routes/feedback");
+app.use("/api/feedback", feedbackRouter);
+
 
 
 
