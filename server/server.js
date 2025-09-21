@@ -11,7 +11,7 @@ const linkedinRoutes = require("../server/Routes/linkedin")
 const app = express();
 const cookieParser = require('cookie-parser');
 const port = 3000;
-const {authenticate} = require("../server/middellwares/authenticate");
+
 app.use(express.json());
 app.use(cookieParser());
 
