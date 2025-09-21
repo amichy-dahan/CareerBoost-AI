@@ -15,9 +15,9 @@ async function login(req, res, next) {
 
         res.cookie("token", token, {
             httpOnly: true,
-            // secure: process.env.NODE_ENV === "production",
-            secure: false,
-            maxAge: 60 * 60 * 1000
+            secure: true,   // אם deploy ב-https
+            sameSite: "lax",
+            maxAge: 1000 * 60 * 60
         });
 
         res.json({ message: "Logged in successfully", user });
@@ -60,4 +60,4 @@ async function getMe(req, res, next) {
     }
 }
 
-module.exports = { login, register , getMe }
+module.exports = { login, register, getMe }
