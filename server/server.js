@@ -16,7 +16,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL,
+  origin: process.env.VITE_SERVER_URL,
   credentials: true
 }));
 
@@ -55,7 +55,7 @@ async function startDB() {
 }
 
 console.log("----------------------------")
-console.log(env.process.FRONTEND_URL)
+console.log(env.process.VITE_SERVER_URL)
 console.log("----------------------------")
 startDB();
 
