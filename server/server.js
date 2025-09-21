@@ -10,7 +10,7 @@ const router = require('../server/Routes/logRegRoute');
 const linkedinRoutes = require("../server/Routes/linkedin")
 const app = express();
 const cookieParser = require('cookie-parser');
-const port = 3000;
+
 
 app.use(express.json());
 app.use(cookieParser());
@@ -35,12 +35,17 @@ app.get("/auth/check", (req, res) => {
   }
 });
 
+app.get("/",(req, res)=>{
+
+  res.send("hello word career boost");
+})
+
 
 
 async function startDB() {
   await mongoose.connect(process.env.MONGO_URI);
-  app.listen(3000, () => {
-    console.log("Server running on http://localhost:3000");
+  app.listen(process.env.PORT, () => {
+    console.log(`Server running on http://localhost:${process.env.PORT}`);
   });
 }
 

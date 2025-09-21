@@ -93,9 +93,7 @@ export const ApplicationsTable = ({ applications, onEdit, onDelete, onDuplicate 
               <TableHead className="font-semibold">Applied</TableHead>
               <TableHead className="font-semibold">Status</TableHead>
               <TableHead className="font-semibold">Technologies</TableHead>
-              <TableHead className="font-semibold">Match Score</TableHead>
               <TableHead className="font-semibold">Resume</TableHead>
-              <TableHead className="font-semibold">Next Action</TableHead>
               <TableHead className="font-semibold w-32">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -153,15 +151,7 @@ export const ApplicationsTable = ({ applications, onEdit, onDelete, onDuplicate 
                     <TechChips technologies={application.technologies} maxVisible={2} />
                   </TableCell>
                   
-                  <TableCell className="text-center">
-                    {application.matchScore ? (
-                      <Badge variant={application.matchScore >= 80 ? 'default' : application.matchScore >= 60 ? 'secondary' : 'outline'}>
-                        {application.matchScore}%
-                      </Badge>
-                    ) : (
-                      <span className="text-muted-foreground">-</span>
-                    )}
-                  </TableCell>
+              
                   
                   <TableCell>
                     <Button
@@ -174,20 +164,7 @@ export const ApplicationsTable = ({ applications, onEdit, onDelete, onDuplicate 
                     </Button>
                   </TableCell>
                   
-                  <TableCell>
-                    {application.nextAction ? (
-                      <div className="space-y-1">
-                        <div className="text-sm">{application.nextAction}</div>
-                        <div className={`text-xs ${getNextActionStyle(nextActionUrgency)}`}>
-                          {formatDate(application.nextActionDate)}
-                          {nextActionUrgency === 'overdue' && ' (Overdue)'}
-                          {nextActionUrgency === 'urgent' && ' (Due Soon)'}
-                        </div>
-                      </div>
-                    ) : (
-                      <span className="text-muted-foreground text-sm">No action set</span>
-                    )}
-                  </TableCell>
+                 
                   
                   <TableCell>
                     <div className="flex gap-1">
