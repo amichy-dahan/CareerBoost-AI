@@ -15,7 +15,7 @@ app.use(express.json());
 app.use(cookieParser());
 // process.env.PROD === "true"? `https://careerboost-ai-1.onrender.com`:`http://localhost:${process.env.PORT}`,
 app.use(cors({
-  origin:`http://localhost:8080`,
+  origin:`https://careerboost-ai-1.onrender.com`,
   credentials: true 
 }));
 
@@ -40,10 +40,10 @@ app.get("/",(req, res)=>{
 
   res.send("hello word career boost");
 })
-app.get("/logout", (req, res) => {
-  res.cookie("token", "", { httpOnly: true, secure: true, sameSite: "none", maxAge: 0 });
-  res.redirect("/login");
-});
+// app.get("/logout", (req, res) => {
+//   res.cookie("token", "", { httpOnly: true, secure: true, sameSite: "none", maxAge: 0 });
+//   res.redirect("/login");
+// });
 
 const feedbackRouter = require("./Routes/feedback");
 app.use("/api/feedback", feedbackRouter);
@@ -53,7 +53,7 @@ app.use("/api/feedback", feedbackRouter);
 
 async function startDB() {
   await mongoose.connect(process.env.MONGO_URI);
-  app.listen(3000, () => {
+  app.listen(process.env.PORT, () => {
     console.log(`Server running on http://localhost:3000`);
   });
 }
