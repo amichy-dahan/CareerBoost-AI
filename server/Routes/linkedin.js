@@ -51,7 +51,7 @@ linkedinRoutes.get("/linkedin/callback", async (req, res) => {
 
         const accessToken = tokenResponse.data.access_token;
         const idToken = tokenResponse.data.id_token;
-      
+
 
 
         const decoded = jwt.decode(idToken);
@@ -68,7 +68,7 @@ linkedinRoutes.get("/linkedin/callback", async (req, res) => {
         } else if (flow === "register") {
             if (user) {
                 // return res.redirect(`http://localhost:8080/login?error=${encodeURIComponent("User already exists. Please login.")}`);
-                  return res.redirect(`${CLIENT_URL}/login?error=${encodeURIComponent("User already exists. Please login.")}`);
+                return res.redirect(`${CLIENT_URL}/login?error=${encodeURIComponent("User already exists. Please login.")}`);
 
             }
             user = await User.create({
@@ -88,13 +88,14 @@ linkedinRoutes.get("/linkedin/callback", async (req, res) => {
 
 
         res.cookie("token", token, {
-            httpOnly: true,        // לא נגיש ל-JS בצד לקוח
-            secure: false,   // למניעת בעיות CORS
-            maxAge: 1000 * 60 * 60 // שעה
+            httpOnly: true,
+            secure: true,           // חייב ב-Render
+            sameSite: "none",       // חייב ב-Render
+            maxAge: 1000 * 60 * 60
         });
 
         // Redirect ל-frontend
-       res.redirect(`${CLIENT_URL}/dashboard`);
+        res.redirect(`${CLIENT_URL}/dashboard`);
 
 
     } catch (err) {
