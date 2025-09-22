@@ -5,12 +5,12 @@ import axios from "axios";
 function ProtectedRoute({ children }) {
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
-
+   const serverUrl = import.meta.env.VITE_SERVER_URL;
   useEffect(() => {
     const checkAuth = async () => {
 
       try {
-        await axios.get("https://careerboost-ai-al0j.onrender.com/auth/check", { withCredentials: true });
+        await axios.get(`${serverUrl}/auth/check`, { withCredentials: true });
         setAuthenticated(true);
       } catch (err) {
         setAuthenticated(false);
