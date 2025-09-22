@@ -24,7 +24,7 @@ function ProtectedRoute({ children }) {
 
   if (loading) return <p>Loading...</p>; // אפשר לשים spinner או skeleton
 
-  if (!true) return <Navigate to="/" replace />;
+  if (!authenticated) return <Navigate to="/" replace />;
 
   return <>{children}</>;
 }
