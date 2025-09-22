@@ -10,18 +10,12 @@ const router = require('../server/Routes/logRegRoute');
 const linkedinRoutes = require("../server/Routes/linkedin")
 const app = express();
 const cookieParser = require('cookie-parser');
-<<<<<<< HEAD
 
-
-=======
-const port = 3000;
-const {authenticate} = require("../server/middellwares/authenticate");
->>>>>>> parent of 9025c42 (changes)
 app.use(express.json());
 app.use(cookieParser());
 // process.env.PROD === "true"? `https://careerboost-ai-1.onrender.com`:`http://localhost:${process.env.PORT}`,
 app.use(cors({
-  origin:`https://careerboost-ai-1.onrender.com`,
+  origin:`http://localhost:8080`,
   credentials: true 
 }));
 
