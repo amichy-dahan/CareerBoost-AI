@@ -6,6 +6,7 @@ function ProtectedRoute({ children }) {
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
    const serverUrl = import.meta.env.VITE_SERVER_URL;
+   console.log("serverUrl:", serverUrl);
   useEffect(() => {
     const checkAuth = async () => {
 
