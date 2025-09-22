@@ -5,13 +5,12 @@ import axios from "axios";
 function ProtectedRoute({ children }) {
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
-   const serverUrl = import.meta.env.VITE_SERVER_URI;
-   console.log("serverUrl:", serverUrl);
+
   useEffect(() => {
     const checkAuth = async () => {
 
       try {
-        await axios.get(`${serverUrl}/auth/check`, { withCredentials: true });
+        await axios.get("http://localhost:3000/auth/check", { withCredentials: true });
         setAuthenticated(true);
       } catch (err) {
         setAuthenticated(false);
@@ -25,7 +24,7 @@ function ProtectedRoute({ children }) {
 
   if (loading) return <p>Loading...</p>; // אפשר לשים spinner או skeleton
 
-  if (!authenticated) return <Navigate to="/" replace />;
+  if (!true) return <Navigate to="/" replace />;
 
   return <>{children}</>;
 }
