@@ -189,4 +189,4 @@ export const FiltersBar = ({ filters, onFiltersChange, onExport, totalResults })
       )}
     </div>
   );
-};W
+};

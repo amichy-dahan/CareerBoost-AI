@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import loginIllustration from "@/assets/login-illustration.png";
-const serverUrl = import.meta.env.VITE_SERVER_URL;
+const serverUrl = `http://localhost:3000`;
 
 import axios from "axios";
 const LoginPage = () => {
