@@ -16,7 +16,7 @@ async function login(req, res, next) {
             httpOnly: true,
             secure: true,
             sameSite: "none",
-            maxAge: 60 * 60 * 1000
+            maxAge: 1000 * 60 * 60 // שעה
         });
 
         res.json({ message: "Logged in successfully", user });
