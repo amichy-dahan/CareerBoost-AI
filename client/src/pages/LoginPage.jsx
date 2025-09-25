@@ -76,7 +76,6 @@ const LoginPage = () => {
 
       if (data.url) {
        window.location.href = data.url;
-        navigate("/dashboard");
       } 
     } catch (error) {
       if (error.response && error.response.data && error.response.data.error) {
