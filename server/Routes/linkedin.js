@@ -99,7 +99,7 @@ linkedinRoutes.get("/linkedin/callback", async (req, res) => {
         // Redirect ל-frontend
 
         process.env.PROD === "true"
-            ? res.json({ success: true })
+            ? res.send({ success: true })
             : res.redirect("http://localhost:8080/dashboard");
 
 
