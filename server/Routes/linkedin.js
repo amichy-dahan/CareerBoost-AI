@@ -5,8 +5,8 @@ const jwt = require('jsonwebtoken');
 require("dotenv").config();
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const axios = require('axios');
-const serverUrl = `http://localhost:3000`;
-const REDIRECT_URI = `http://localhost:3000/auth/linkedin/callback`
+const REDIRECT_URI = process.env.PROD === "true" ? `https://careerboost-ai-al0j.onrender.com/auth/linkedin/callback` : `http://localhost:${process.env.PORT}/auth/linkedin/callback`
+
 const User = require("../models/User");
 
 
@@ -50,7 +50,7 @@ linkedinRoutes.get("/linkedin/callback", async (req, res) => {
 
         const accessToken = tokenResponse.data.access_token;
         const idToken = tokenResponse.data.id_token;
-      
+
 
 
         const decoded = jwt.decode(idToken);
@@ -60,12 +60,19 @@ linkedinRoutes.get("/linkedin/callback", async (req, res) => {
 
         if (flow === "login") {
             if (!user) {
-                return res.redirect(`http://localhost:8080/login?error=${encodeURIComponent("User not registered. Please register first.")}`);
+                const redirectUrl = process.env.PROD === "true"
+                    ? `https://careerboost-ai-1.onrender.com/login?error=${encodeURIComponent("User not registered. Please register first.")}`
+                    : `http://localhost:8080/login?error=${encodeURIComponent("User not registered. Please register first.")}`;
+
+                return res.redirect(redirectUrl);
             }
         } else if (flow === "register") {
             if (user) {
-                return res.redirect(`http://localhost:8080/login?error=${encodeURIComponent("User already exists. Please login.")}`);
+                  const redirectUrl = process.env.PROD === "true"
+                    ? `https://careerboost-ai-1.onrender.com/login?error=${encodeURIComponent("User already exists. Please login..")}`
+                    : `http://localhost:8080/login?error=${encodeURIComponent("User already exists. Please login.")}`;
 
+                return res.redirect(redirectUrl);
             }
             user = await User.create({
                 linkedinId: decoded.sub,
@@ -90,7 +97,10 @@ linkedinRoutes.get("/linkedin/callback", async (req, res) => {
         });
 
         // Redirect ל-frontend
-        res.redirect("http://localhost:8080/dashboard");
+
+        process.env.PROD === "true"
+            ? res.redirect("https://careerboost-ai-1.onrender.com/dashboard")
+            : res.redirect("http://localhost:8080/dashboard");
 
 
     } catch (err) {
