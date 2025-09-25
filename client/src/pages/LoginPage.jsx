@@ -76,9 +76,8 @@ const LoginPage = () => {
 
       if (data.url) {
         window.location.href = data.url;
-      } else if (data.success) {
         navigate("/dashboard");
-      }
+      } 
     } catch (error) {
       if (error.response && error.response.data && error.response.data.error) {
         alert(error.response.data.error); // מציג את השגיאה
