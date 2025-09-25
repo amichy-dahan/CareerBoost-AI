@@ -88,8 +88,8 @@ linkedinRoutes.get("/linkedin/callback", async (req, res) => {
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
             expiresIn: "1h",
         });
-
-
+    
+        console.log(token);
         res.cookie("token", token, {
             httpOnly: true,        // לא נגיש ל-JS בצד לקוח
             secure: false,   // למניעת בעיות CORS
@@ -99,8 +99,8 @@ linkedinRoutes.get("/linkedin/callback", async (req, res) => {
         // Redirect ל-frontend
 
         process.env.PROD === "true"
-            ? res.redirect("https://careerboost-ai-1.onrender.com/dashboard")
-            : res.redirect("http://localhost:8080/dashboard");
+            ? res.send("true")
+            : res.send("http://localhost:8080/dashboard");
 
 
     } catch (err) {

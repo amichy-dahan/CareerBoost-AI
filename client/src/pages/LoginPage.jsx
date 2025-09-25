@@ -74,8 +74,8 @@ const LoginPage = () => {
 
       console.log("LinkedIn response:", data);
 
-      if (data.url) {
-        window.location.href = data.url;
+      if (data) {
+        console.log(data)
       } else if (data.success) {
         navigate("/dashboard");
       }
