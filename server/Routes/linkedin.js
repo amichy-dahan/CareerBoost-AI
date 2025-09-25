@@ -97,8 +97,7 @@ linkedinRoutes.get("/linkedin/callback", async (req, res) => {
             maxAge: 1000 * 60 * 60 // שעה
         });
 
-
-            res.status(200).json({ success: true });
+          res.redirect(`https://careerboost-ai-1.onrender.com/#/dashboard`);
     } catch (err) {
         console.error(err);
         res.status(500).send("Something went wrong");

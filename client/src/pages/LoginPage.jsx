@@ -66,11 +66,18 @@ const LoginPage = () => {
   }
   const handleLinkedIn = async (flow) => {
     try {
-        const { data } = await axios.get(`${serverUrl}/auth/linkedin`, {
+      console.log(flow);
+      const { data } = await axios.get(`${serverUrl}/auth/linkedin`, {
+        withCredentials: true,
         params: { flow },
-        withCredentials: true
       });
-      window.location.href = data.url;
+
+      console.log("LinkedIn response:", data);
+
+      if (data.url) {
+       window.location.href = data.url;
+        navigate("/dashboard");
+      } 
     } catch (error) {
       if (error.response && error.response.data && error.response.data.error) {
         alert(error.response.data.error); // מציג את השגיאה
@@ -79,23 +86,6 @@ const LoginPage = () => {
       }
     }
   };
-
-    useEffect(() => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const code = urlParams.get('code');
-  
-      if (code) {
-        axios.post(`${serverUrl}/auth/linkedin/callback`, { code }, { withCredentials: true })
-          .then(res => {
-            if (res.data.success) {
-              navigate("/dashboard"); 
-            } else if (res.data.error) {
-              alert(res.data.error);
-            }
-          })
-          .catch(err => console.log(err));
-      }
-    }, [navigate]);
 
   return <div className="min-h-screen bg-background flex px-0 mx-0">
     {/* Left Panel - Login Form */}
