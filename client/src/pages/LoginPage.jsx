@@ -17,7 +17,8 @@ const LoginPage = () => {
     password: ""
   });
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
+    const hash = window.location.hash;
+    const params = new URLSearchParams(hash.split("?")[1]);
     const errMsg = params.get("error");
     if (errMsg) setError(decodeURIComponent(errMsg));
   }, []);
@@ -75,8 +76,8 @@ const LoginPage = () => {
       console.log("LinkedIn response:", data);
 
       if (data.url) {
-       window.location.href = data.url;
-      } 
+        window.location.href = data.url;
+      }
     } catch (error) {
       if (error.response && error.response.data && error.response.data.error) {
         alert(error.response.data.error); // מציג את השגיאה
