@@ -14,9 +14,8 @@ const cookieParser = require('cookie-parser');
 
 app.use(express.json());
 app.use(cookieParser());
-// process.env.PROD === "true"? `https://careerboost-ai-1.onrender.com`:`http://localhost:${process.env.PORT}`,
 app.use(cors({
-  origin:`http://localhost:8080`,
+  origin: process.env.PROD === "true"? `https://careerboost-ai-1.onrender.com`:`http://localhost:${process.env.PORT}`,
   credentials: true 
 }));
 
@@ -54,7 +53,7 @@ app.use("/api/feedback", feedbackRouter);
 
 async function startDB() {
   await mongoose.connect(process.env.MONGO_URI);
-  app.listen(3000, () => {
+  app.listen(process.env.PORT, () => {
     console.log(`Server running on http://localhost:3000`);
   });
 }
