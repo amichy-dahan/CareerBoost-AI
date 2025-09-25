@@ -61,7 +61,7 @@ linkedinRoutes.get("/linkedin/callback", async (req, res) => {
         if (flow === "login") {
             if (!user) {
                 const redirectUrl = process.env.PROD === "true"
-                    ? `https://careerboost-ai-1.onrender.com/login?error=${encodeURIComponent("User not registered. Please register first.")}`
+                    ? `https://careerboost-ai-1.onrender.com/#login?error=${encodeURIComponent("User not registered. Please register first.")}`
                     : `http://localhost:8080/login?error=${encodeURIComponent("User not registered. Please register first.")}`;
 
                 return res.redirect(redirectUrl);
@@ -69,7 +69,7 @@ linkedinRoutes.get("/linkedin/callback", async (req, res) => {
         } else if (flow === "register") {
             if (user) {
                   const redirectUrl = process.env.PROD === "true"
-                    ? `https://careerboost-ai-1.onrender.com/login?error=${encodeURIComponent("User already exists. Please login..")}`
+                    ? `https://careerboost-ai-1.onrender.com/#login?error=${encodeURIComponent("User already exists. Please login..")}`
                     : `http://localhost:8080/login?error=${encodeURIComponent("User already exists. Please login.")}`;
 
                 return res.redirect(redirectUrl);
