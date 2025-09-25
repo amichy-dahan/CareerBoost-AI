@@ -75,8 +75,6 @@ const LoginPage = () => {
       console.log("LinkedIn response:", data);
 
       if (data) {
-        console.log(data)
-      } else if (data.success) {
         navigate("/dashboard");
       }
     } catch (error) {
