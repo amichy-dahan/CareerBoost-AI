@@ -90,16 +90,17 @@ linkedinRoutes.get("/linkedin/callback", async (req, res) => {
         });
     
         console.log(token);
-        res.cookie("token", token, {
-            httpOnly: true,        // לא נגיש ל-JS בצד לקוח
-            secure: false,   // למניעת בעיות CORS
+       res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
             maxAge: 1000 * 60 * 60 // שעה
         });
 
         // Redirect ל-frontend
 
         process.env.PROD === "true"
-            ? res.send({ success: true })
+            ? res.redirect("https://careerboost-ai-1.onrender.com/dashboard")
             : res.redirect("http://localhost:8080/dashboard");
 
 
