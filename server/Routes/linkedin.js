@@ -98,9 +98,7 @@ linkedinRoutes.get("/linkedin/callback", async (req, res) => {
         });
 
         // Redirect ל-frontend
-
-
-
+            res.status(200).json({ success: true });
     } catch (err) {
         console.error(err);
         res.status(500).send("Something went wrong");
