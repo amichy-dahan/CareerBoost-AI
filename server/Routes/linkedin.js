@@ -100,7 +100,7 @@ linkedinRoutes.get("/linkedin/callback", async (req, res) => {
         // Redirect ל-frontend
 
         process.env.PROD === "true"
-            ? res.redirect("https://careerboost-ai-1.onrender.com/dashboard")
+            ? res.redirect("/dashboard")
             : res.redirect("http://localhost:8080/dashboard");
 
 
