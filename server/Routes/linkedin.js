@@ -5,8 +5,8 @@ const jwt = require('jsonwebtoken');
 require("dotenv").config();
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 const axios = require('axios');
-const serverUrl = `https://careerboost-ai-al0j.onrender.com`;
-const REDIRECT_URI = `${serverUrl}/auth/linkedin/callback`;
+const REDIRECT_URI = process.env.PROD === "true" ? `https://careerboost-ai-al0j.onrender.com/auth/linkedin/callback` : `http://localhost:${process.env.PORT}/auth/linkedin/callback`
+
 const User = require("../models/User");
 
 
@@ -50,7 +50,7 @@ linkedinRoutes.get("/linkedin/callback", async (req, res) => {
 
         const accessToken = tokenResponse.data.access_token;
         const idToken = tokenResponse.data.id_token;
-        console.log(token)
+
 
 
         const decoded = jwt.decode(idToken);
@@ -60,12 +60,19 @@ linkedinRoutes.get("/linkedin/callback", async (req, res) => {
 
         if (flow === "login") {
             if (!user) {
-                return res.redirect(`https://careerboost-ai-1.onrender.com/login?error=${encodeURIComponent("User not registered. Please register first.")}`);
+                const redirectUrl = process.env.PROD === "true"
+                    ? `https://careerboost-ai-1.onrender.com/#/login?error=${encodeURIComponent("User not registered. Please register first.")}`
+                    : `http://localhost:8080/login?error=${encodeURIComponent("User not registered. Please register first.")}`;
+
+                return res.redirect(redirectUrl);
             }
         } else if (flow === "register") {
             if (user) {
-                return res.redirect(`https://careerboost-ai-1.onrender.com/login?error=${encodeURIComponent("User already exists. Please login.")}`);
+                  const redirectUrl = process.env.PROD === "true"
+                    ? `https://careerboost-ai-1.onrender.com/#/login?error=${encodeURIComponent("User already exists. Please login..")}`
+                    : `http://localhost:8080/login?error=${encodeURIComponent("User already exists. Please login.")}`;
 
+                return res.redirect(redirectUrl);
             }
             user = await User.create({
                 linkedinId: decoded.sub,
@@ -81,19 +88,16 @@ linkedinRoutes.get("/linkedin/callback", async (req, res) => {
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
             expiresIn: "1h",
         });
-
-
-        res.cookie("token", token, {
-            httpOnly: true,        // לא נגיש ל-JS בצד לקוח
+    
+        console.log(token);
+       res.cookie("token", token, {
+            httpOnly: true,
             secure: true,
-            sameSite: "none" ,   // למניעת בעיות CORS
+            sameSite: "none",
             maxAge: 1000 * 60 * 60 // שעה
         });
 
-        // Redirect ל-frontend
-        res.redirect("https://careerboost-ai-1.onrender.com/dashboard");
-
-
+          res.redirect(`https://careerboost-ai-1.onrender.com/#/dashboard`);
     } catch (err) {
         console.error(err);
         res.status(500).send("Something went wrong");

@@ -10,18 +10,12 @@ const router = require('../server/Routes/logRegRoute');
 const linkedinRoutes = require("../server/Routes/linkedin")
 const app = express();
 const cookieParser = require('cookie-parser');
-<<<<<<< HEAD
 
 
-=======
-const port = 3000;
-const {authenticate} = require("../server/middellwares/authenticate");
->>>>>>> parent of 9025c42 (changes)
 app.use(express.json());
 app.use(cookieParser());
-// process.env.PROD === "true"? `https://careerboost-ai-1.onrender.com`:`http://localhost:${process.env.PORT}`,
 app.use(cors({
-  origin:`https://careerboost-ai-1.onrender.com`,
+  origin: process.env.PROD === "true"? `https://careerboost-ai-1.onrender.com`:`http://localhost:${process.env.PORT}`,
   credentials: true 
 }));
 
@@ -59,7 +53,7 @@ app.use("/api/feedback", feedbackRouter);
 
 async function startDB() {
   await mongoose.connect(process.env.MONGO_URI);
-  app.listen(3000, () => {
+  app.listen(process.env.PORT, () => {
     console.log(`Server running on http://localhost:3000`);
   });
 }

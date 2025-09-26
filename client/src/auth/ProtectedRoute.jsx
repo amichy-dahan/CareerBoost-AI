@@ -5,12 +5,13 @@ import axios from "axios";
 function ProtectedRoute({ children }) {
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
+  const serverUrl = "https://careerboost-ai-al0j.onrender.com";
 
   useEffect(() => {
     const checkAuth = async () => {
 
       try {
-        await axios.get("https://careerboost-ai-al0j.onrender.com/auth/check", { withCredentials: true });
+        await axios.get(`${serverUrl}/auth/check`, { withCredentials: true });
         setAuthenticated(true);
       } catch (err) {
         setAuthenticated(false);
@@ -24,7 +25,7 @@ function ProtectedRoute({ children }) {
 
   if (loading) return <p>Loading...</p>; // אפשר לשים spinner או skeleton
 
-  if (!true) return <Navigate to="/" replace />;
+  if (!authenticated) return <Navigate to="/" replace />;
 
   return <>{children}</>;
 }

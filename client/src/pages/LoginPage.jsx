@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import loginIllustration from "@/assets/login-illustration.png";
-const serverUrl = import.meta.env.VITE_SERVER_URL;
+const serverUrl = "https://careerboost-ai-al0j.onrender.com";
 
 import axios from "axios";
 const LoginPage = () => {
@@ -17,7 +17,8 @@ const LoginPage = () => {
     password: ""
   });
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
+    const hash = window.location.hash;
+    const params = new URLSearchParams(hash.split("?")[1]);
     const errMsg = params.get("error");
     if (errMsg) setError(decodeURIComponent(errMsg));
   }, []);
@@ -76,8 +77,6 @@ const LoginPage = () => {
 
       if (data.url) {
         window.location.href = data.url;
-      } else if (data.success) {
-        navigate("/dashboard");
       }
     } catch (error) {
       if (error.response && error.response.data && error.response.data.error) {
