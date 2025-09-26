@@ -38,7 +38,7 @@ const Navigation = () => {
             Applications
           </NavLink>
           <NavLink
-            to="/generate-resume"
+            to="/resume"
             className={({ isActive }) =>
               `transition-colors border-b-2 ${
                 isActive
@@ -47,7 +47,7 @@ const Navigation = () => {
               }`
             }
           >
-            Generate Resume
+            Resume Improver
           </NavLink>
         </div>
 
