@@ -15,10 +15,7 @@ const ApplicationsPage = () => {
   const {
     toast
   } = useToast();
-  const {
-    data,
-    isLoading
-  } = useApplications(filters, page, 20);
+  const { data, isLoading, reload } = useApplications(filters, page, 20);
   const handleExport = () => {
     // Mock CSV export
     const csvContent = ['Company,Role,Status,Applied Date,Match Score,Technologies', ...data.items.map(app => `"${app.company}","${app.roleTitle}","${app.status}","${app.appliedAt || ''}","${app.matchScore || ''}","${app.technologies.join('; ')}"`)].join('\n');
@@ -44,12 +41,21 @@ const ApplicationsPage = () => {
     setEditingApplication(application);
     setDrawerOpen(true);
   };
-  const handleDeleteApplication = applicationId => {
-    // Mock delete
-    toast({
-      title: "Application deleted",
-      description: "The application has been removed from your list"
-    });
+  const handleDeleteApplication = async (applicationId) => {
+    try {
+      const res = await fetch(`/api/applications/${applicationId}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      if (!res.ok) throw new Error();
+      toast({
+        title: "Application deleted",
+        description: "The application has been removed"
+      });
+      reload();
+    } catch {
+      toast({ title: 'Delete failed', variant: 'destructive' });
+    }
   };
   const handleDuplicateApplication = application => {
     setEditingApplication({
@@ -62,14 +68,26 @@ const ApplicationsPage = () => {
     });
     setDrawerOpen(true);
   };
-  const handleSaveApplication = applicationData => {
-    // Mock save
+  const handleSaveApplication = async (applicationData) => {
     const isEditing = Boolean(editingApplication?.id);
-    toast({
-      title: isEditing ? "Application updated" : "Application added",
-      description: `${applicationData.company} - ${applicationData.roleTitle} has been ${isEditing ? 'updated' : 'added'}`
-    });
-    setEditingApplication(undefined);
+    try {
+      const res = await fetch(`/api/applications${isEditing ? `/${editingApplication.id}` : ''}`, {
+        method: isEditing ? 'PUT' : 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(applicationData)
+      });
+      if (!res.ok) throw new Error();
+      toast({
+        title: isEditing ? 'Application updated' : 'Application added',
+        description: `${applicationData.company} - ${applicationData.roleTitle}`
+      });
+      setEditingApplication(undefined);
+      setDrawerOpen(false);
+      reload();
+    } catch {
+      toast({ title: 'Save failed', variant: 'destructive' });
+    }
   };
   return <>
     <Navigation />

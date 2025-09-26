@@ -88,16 +88,24 @@ linkedinRoutes.get("/linkedin/callback", async (req, res) => {
         const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
             expiresIn: "1h",
         });
-    
-        console.log(token);
-       res.cookie("token", token, {
+
+        const isProd = process.env.PROD === 'true';
+        // IMPORTANT:
+        // In development (http://localhost) a cookie with secure:true will be REJECTED by browsers
+        // over plain HTTP, causing "No token provided" in protected routes.
+        // We mirror the logic used in email/password login controller.
+        res.cookie("token", token, {
             httpOnly: true,
-            secure: true,
-            sameSite: "none",
-            maxAge: 1000 * 60 * 60 // שעה
+            secure: isProd,              // only secure in production (https)
+            sameSite: isProd ? "none" : "lax", // allow dev frontend on different port
+            maxAge: 1000 * 60 * 60
         });
 
-          res.redirect(`https://careerboost-ai-1.onrender.com/#/dashboard`);
+        // In dev redirect to local app, in prod to deployed URL
+        const redirectBase = isProd
+            ? 'https://careerboost-ai-1.onrender.com/#/dashboard'
+            : 'http://localhost:5173/#/dashboard';
+        res.redirect(redirectBase);
     } catch (err) {
         console.error(err);
         res.status(500).send("Something went wrong");

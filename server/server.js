@@ -14,9 +14,23 @@ const cookieParser = require('cookie-parser');
 
 app.use(express.json());
 app.use(cookieParser());
+// CORS configuration: allow server origin + Vite dev origin during development
+const devOrigins = [
+  `http://localhost:${process.env.PORT || 3000}`,
+  'http://localhost:5173',
+  'http://localhost:8080'
+];
 app.use(cors({
-  origin: process.env.PROD === "true"? `https://careerboost-ai-1.onrender.com`:`http://localhost:${process.env.PORT}`,
-  credentials: true 
+  origin: (origin, cb) => {
+    if (!origin) return cb(null, true); // non-browser clients
+    if (process.env.PROD === 'true') {
+      const prodOrigin = 'https://careerboost-ai-1.onrender.com';
+      return origin === prodOrigin ? cb(null, true) : cb(new Error('Not allowed by CORS'));
+    }
+    if (devOrigins.includes(origin)) return cb(null, true);
+    return cb(new Error('Not allowed by CORS'));
+  },
+  credentials: true
 }));
 
 app.use('/users', router);
@@ -45,17 +59,44 @@ app.get("/logout", (req, res) => {
   res.redirect("/login");
 });
 
+// Simple DB health check endpoint
+app.get('/health/db', (req, res) => {
+  // 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
+  const state = mongoose.connection.readyState;
+  res.json({ readyState: state });
+});
+
 const feedbackRouter = require("./Routes/feedback");
+const applicationsRouter = require('./Routes/applications');
 app.use("/api/feedback", feedbackRouter);
+app.use('/api/applications', applicationsRouter);
 
 
 
 
 async function startDB() {
-  await mongoose.connect(process.env.MONGO_URI);
-  app.listen(process.env.PORT, () => {
-    console.log(`Server running on http://localhost:3000`);
-  });
+  if (!process.env.MONGO_URI) {
+    console.error('MONGO_URI not set in environment');
+    process.exit(1);
+  }
+  try {
+    // Add detailed connection event listeners once (before connect)
+    mongoose.connection.on('connected', () => console.log('[Mongo] connected'));
+    mongoose.connection.on('error', (err) => console.error('[Mongo] connection error:', err.message));
+    mongoose.connection.on('disconnected', () => console.warn('[Mongo] disconnected'));
+    mongoose.connection.on('reconnected', () => console.log('[Mongo] reconnected'));
+    mongoose.connection.on('connecting', () => console.log('[Mongo] connecting...'));
+
+    await mongoose.connect(process.env.MONGO_URI, { maxPoolSize: 10 });
+    console.log('Mongo connected');
+    const port = process.env.PORT || 3000;
+    app.listen(port, () => {
+      console.log(`Server running on http://localhost:${port}`);
+    });
+  } catch (err) {
+    console.error('Mongo connection error', err);
+    process.exit(1);
+  }
 }
 
 startDB();

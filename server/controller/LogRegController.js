@@ -12,11 +12,14 @@ async function login(req, res, next) {
             { expiresIn: "1h" }
         );
 
+        const isProd = process.env.PROD === 'true';
+        // In development (http://localhost) a secure cookie will NOT be stored by the browser.
+        // We relax sameSite for local dev to allow frontend (possibly different port) to send the cookie.
         res.cookie("token", token, {
             httpOnly: true,
-            secure: true,
-            sameSite: "none",
-            maxAge: 1000 * 60 * 60 // שעה
+            secure: isProd,            // only secure in production (https)
+            sameSite: isProd ? "none" : "lax",
+            maxAge: 1000 * 60 * 60
         });
 
         res.json({ message: "Logged in successfully", user });
@@ -32,7 +35,7 @@ async function register(req, res, next) {
     try {
         const { full_name, email, password } = req.body;
         const newUser = await AuthNodel.register(full_name, email, password);
-        res.status(201).json({ message: "User registered successfully", user: newUser });
+    res.status(201).json({ message: "User registered successfully", user: newUser });
     } catch (err) {
         console.error(err);
         const statusCode = err.status || 400;

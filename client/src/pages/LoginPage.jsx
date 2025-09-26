@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import loginIllustration from "@/assets/login-illustration.png";
-const serverUrl = "https://careerboost-ai-al0j.onrender.com";
+import { withApi } from "@/lib/apiConfig";
 
 import axios from "axios";
 const LoginPage = () => {
@@ -37,14 +37,14 @@ const LoginPage = () => {
   const handlelogin = async (flow) => {
     try {
       if (flow === "Sing in") {
-        const response = await axios.post(`${serverUrl}/users/login`, {
+        const response = await axios.post(withApi('/users/login'), {
           email: formData.email,
           password: formData.password
         }, { withCredentials: true });
         console.log(response.data);
         navigate("/dashboard");
       } else {
-        const response = await axios.post(`${serverUrl}/users/register`, {
+        const response = await axios.post(withApi('/users/register'), {
           full_name: formData.firstName + " " + formData.lastName,
           email: formData.email,
           password: formData.password
@@ -68,7 +68,7 @@ const LoginPage = () => {
   const handleLinkedIn = async (flow) => {
     try {
       console.log(flow);
-      const { data } = await axios.get(`${serverUrl}/auth/linkedin`, {
+      const { data } = await axios.get(withApi('/auth/linkedin'), {
         withCredentials: true,
         params: { flow },
       });
