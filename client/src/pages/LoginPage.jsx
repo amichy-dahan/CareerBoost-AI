@@ -4,18 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import loginIllustration from "@/assets/login-illustration.png";
 import { withApi } from "@/lib/apiConfig";
-
 import axios from "axios";
 const LoginPage = () => {
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [isLogin, setIsLogin] = useState(true);
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    password: ""
-  });
+  const [formData, setFormData] = useState({ firstName: "", lastName: "", email: "", password: "" });
+  const [submitting, setSubmitting] = useState(false);
   useEffect(() => {
     const hash = window.location.hash;
     const params = new URLSearchParams(hash.split("?")[1]);
@@ -34,37 +29,36 @@ const LoginPage = () => {
     console.log("Form submitted:", formData);
   };
 
-  const handlelogin = async (flow) => {
+  const handlelogin = async () => {
+    if (submitting) return;
+    setSubmitting(true);
     try {
-      if (flow === "Sing in") {
-        const response = await axios.post(withApi('/users/login'), {
-          email: formData.email,
-          password: formData.password
-        }, { withCredentials: true });
-        console.log(response.data);
-        navigate("/dashboard");
+      let resp;
+      if (isLogin) {
+        resp = await axios.post(withApi('/users/login'), { email: formData.email, password: formData.password }, { withCredentials: true });
       } else {
-        const response = await axios.post(withApi('/users/register'), {
-          full_name: formData.firstName + " " + formData.lastName,
-          email: formData.email,
-          password: formData.password
-        }, { withCredentials: true });
-        console.log(response.data);
-        navigate("/dashboard");
+        resp = await axios.post(withApi('/users/register'), { full_name: formData.firstName + ' ' + formData.lastName, email: formData.email, password: formData.password }, { withCredentials: true });
       }
-
+      if (resp?.data?.user) {
+        try { localStorage.setItem('authUser', JSON.stringify(resp.data.user)); } catch {}
+      }
+      // Optionally verify cookie/token before navigating (non-blocking)
+      try { await axios.get(withApi('/auth/check'), { withCredentials: true }); } catch {}
+      navigate('/dashboard', { replace: true });
     } catch (error) {
       if (error.response && error.response.data) {
         if (error.response.data.errors) {
-          alert(error.response.data.errors[0].msg);
+          setError(error.response.data.errors[0].msg);
         } else if (error.response.data.error) {
-          alert(error.response.data.error);
+          setError(error.response.data.error);
         }
       } else {
-        alert("Network error");
+        setError('Network error');
       }
+    } finally {
+      setSubmitting(false);
     }
-  }
+  };
   const handleLinkedIn = async (flow) => {
     try {
       console.log(flow);
@@ -145,8 +139,8 @@ const LoginPage = () => {
             </button>
           </div>}
 
-          <Button onClick={() => handlelogin(isLogin ? "Sing in" : "Create")} type="submit" className="w-full h-12 bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 text-primary-foreground font-semibold mx-0 py-[21px] my-[29px]">
-            {isLogin ? "Sign in" : "Create account"}
+          <Button onClick={handlelogin} type="submit" disabled={submitting} className="w-full h-12 bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 disabled:opacity-60 text-primary-foreground font-semibold mx-0 py-[21px] my-[29px]">
+            {submitting ? (isLogin ? 'Signing in...' : 'Creating...') : (isLogin ? 'Sign in' : 'Create account')}
           </Button>
         </form>
 

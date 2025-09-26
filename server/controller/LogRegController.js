@@ -12,17 +12,35 @@ async function login(req, res, next) {
             { expiresIn: "1h" }
         );
 
-        const isProd = process.env.PROD === 'true';
-        // In development (http://localhost) a secure cookie will NOT be stored by the browser.
-        // We relax sameSite for local dev to allow frontend (possibly different port) to send the cookie.
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: isProd,            // only secure in production (https)
-            sameSite: isProd ? "none" : "lax",
-            maxAge: 1000 * 60 * 60
-        });
+                // Adaptive cookie strategy:
+                // - If request host is a render.com domain (production), use Secure + SameSite=None.
+                // - If local (localhost / 127.0.0.1), allow Secure=false + SameSite=Lax so cookie is stored over HTTP.
+                // Forcing Secure on localhost prevents the cookie from being set and breaks login.
+                const host = (req.get('host') || '').toLowerCase();
+                const isRenderHost = /\.onrender\.com$/.test(host);
+                const force = (process.env.FORCE_CROSS_SITE_COOKIE || 'true') === 'true';
+                let cookieOptions;
+                if (isRenderHost && force) {
+                    cookieOptions = {
+                        httpOnly: true,
+                        secure: true,
+                        sameSite: 'None',
+                        path: '/',
+                        maxAge: 1000 * 60 * 60
+                    };
+                } else {
+                    cookieOptions = {
+                        httpOnly: true,
+                        secure: false,          // allow over http during local dev
+                        sameSite: 'lax',
+                        path: '/',
+                        maxAge: 1000 * 60 * 60
+                    };
+                }
+                res.cookie('token', token, cookieOptions);
 
-        res.json({ message: "Logged in successfully", user });
+    const safeUser = { id: user._id, email: user.email, firstName: user.firstName, lastName: user.lastName };
+    res.json({ message: "Logged in successfully", user: safeUser });
     } catch (err) {
         const statusCode = err.status || 500;
         res.status(statusCode).json({
@@ -35,12 +53,29 @@ async function register(req, res, next) {
     try {
         const { full_name, email, password } = req.body;
         const newUser = await AuthNodel.register(full_name, email, password);
-    res.status(201).json({ message: "User registered successfully", user: newUser });
+        // Sign token just like login for immediate session
+        const token = jwt.sign(
+            { id: newUser._id, email: newUser.email },
+            process.env.JWT_SECRET,
+            { expiresIn: '1h' }
+        );
+        const host = (req.get('host') || '').toLowerCase();
+        const isRenderHost = /\.onrender\.com$/.test(host);
+        const force = (process.env.FORCE_CROSS_SITE_COOKIE || 'true') === 'true';
+        let cookieOptions;
+        if (isRenderHost && force) {
+            cookieOptions = { httpOnly: true, secure: true, sameSite: 'None', path: '/', maxAge: 1000 * 60 * 60 };
+        } else {
+            cookieOptions = { httpOnly: true, secure: false, sameSite: 'lax', path: '/', maxAge: 1000 * 60 * 60 };
+        }
+        res.cookie('token', token, cookieOptions);
+        const safeUser = { id: newUser._id, email: newUser.email, firstName: newUser.firstName, lastName: newUser.lastName };
+        res.status(201).json({ message: 'User registered successfully', user: safeUser });
     } catch (err) {
         console.error(err);
         const statusCode = err.status || 400;
         res.status(statusCode).json({
-            error: err.message || "Server error"
+            error: err.message || 'Server error'
         });
     }
 }

@@ -4,11 +4,14 @@ import { Button } from "@/components/ui/button";
 import { ArrowUpRight, Calendar, CheckCircle, AlertCircle, Clock, Star } from "lucide-react";
 import UserProfileCard from "./UserProfileCard";
 import { useApplications } from "@/features/applications/hooks/useApplications";
+import { useAllApplications } from "@/features/applications/hooks/useAllApplications";
 const Dashboard = () => {
-  const {
-    data: applicationsData
-  } = useApplications();
-  const applications = applicationsData?.items || [];
+  // Keep lightweight first page fetch for immediate UI (recent activity & actions use)
+  const { data: applicationsData } = useApplications();
+  const firstPageApplications = applicationsData?.items || [];
+  // Load all applications for accurate aggregate metrics (frontend-only pagination crawl)
+  const { applications: allApplications, isLoading: isLoadingAll } = useAllApplications();
+  const applications = allApplications.length ? allApplications : firstPageApplications;
 
   // Generate priority actions from applications data
   const actionItems = [];
@@ -89,6 +92,7 @@ const Dashboard = () => {
   const averageMatchScore = applications.length > 0 ? Math.round(applications.reduce((sum, app) => sum + (app.matchScore || 0), 0) / applications.length) : 0;
   const activeApplications = applications.filter(app => !['Rejected', 'Ghosted', 'Withdrawn'].includes(app.status)).length;
   const pendingActions = applications.filter(app => app.nextAction && app.nextActionDate && new Date(app.nextActionDate) >= new Date()).length;
+  const totalApplications = applications.length;
 
   // Generate recent activity
   const recentActivity = [];
@@ -160,6 +164,9 @@ const Dashboard = () => {
                   <div className="text-center">
                     <div className="text-3xl font-bold text-warning mb-2">{pendingActions}</div>
                     <div className="text-sm text-muted-foreground">Pending Actions</div>
+                  </div>
+                  <div className="text-center col-span-3 text-xs text-muted-foreground">
+                    {isLoadingAll ? 'Loading full portfolio...' : `${totalApplications} total applications aggregated`}
                   </div>
                 </div>
 

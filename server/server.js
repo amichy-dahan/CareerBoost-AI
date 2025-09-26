@@ -11,26 +11,51 @@ const linkedinRoutes = require("../server/Routes/linkedin")
 const app = express();
 const cookieParser = require('cookie-parser');
 
+// Optional verbose mongoose debug (query-level) if enabled via env
+if (process.env.DEBUG_MONGO === 'true') {
+  mongoose.set('debug', (coll, method, query, doc, options) => {
+    try {
+      console.log(`[MongoDebug] ${coll}.${method} query=${JSON.stringify(query)} doc=${doc ? JSON.stringify(doc) : ''}`);
+    } catch {}
+  });
+  console.log('[MongoDebug] Enabled');
+}
+
 
 app.use(express.json());
 app.use(cookieParser());
-// CORS configuration: allow server origin + Vite dev origin during development
-const devOrigins = [
+// Flexible CORS configuration supporting multiple prod + dev origins.
+// Set CORS_ORIGINS env as comma-separated list to append.
+const baseDevOrigins = [
   `http://localhost:${process.env.PORT || 3000}`,
   'http://localhost:5173',
   'http://localhost:8080'
 ];
+const prodDefaults = [
+  'https://careerboost-ai-1.onrender.com',
+  'https://careerboost-ai-al0j.onrender.com'
+];
+const extra = (process.env.CORS_ORIGINS || '')
+  .split(',')
+  .map(s => s.trim())
+  .filter(Boolean);
+// If PROD=true keep dev origins too so local testing against prod API works.
+const allowedOrigins = Array.from(new Set([
+  ...baseDevOrigins,
+  ...prodDefaults,
+  ...extra
+]));
+console.log('[CORS] Allowed origins:', allowedOrigins);
 app.use(cors({
   origin: (origin, cb) => {
-    if (!origin) return cb(null, true); // non-browser clients
-    if (process.env.PROD === 'true') {
-      const prodOrigin = 'https://careerboost-ai-1.onrender.com';
-      return origin === prodOrigin ? cb(null, true) : cb(new Error('Not allowed by CORS'));
-    }
-    if (devOrigins.includes(origin)) return cb(null, true);
+    if (!origin) return cb(null, true); // non-browser (curl, server-side)
+    if (allowedOrigins.includes(origin)) return cb(null, true);
+    console.warn('[CORS] Blocked origin:', origin);
     return cb(new Error('Not allowed by CORS'));
   },
-  credentials: true
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
 }));
 
 app.use('/users', router);
@@ -71,6 +96,14 @@ const applicationsRouter = require('./Routes/applications');
 app.use("/api/feedback", feedbackRouter);
 app.use('/api/applications', applicationsRouter);
 
+// Central error handler (including CORS rejections) before DB start message
+app.use((err, req, res, next) => {
+  if (err.message && /CORS/i.test(err.message)) {
+    return res.status(403).json({ error: 'CORS blocked', detail: err.message });
+  }
+  console.error('[Error]', err);
+  res.status(err.status || 500).json({ error: err.message || 'Internal server error' });
+});
 
 
 

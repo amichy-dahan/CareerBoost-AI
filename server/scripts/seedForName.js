@@ -11,6 +11,7 @@
 
 require('dotenv').config();
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const Application = require('../models/Application');
 
@@ -30,9 +31,19 @@ async function main() {
     let user = await User.findOne({ firstName, lastName });
     if (!user) {
       const email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}.dev@example.com`;
-      user = await User.create({ firstName, lastName, email, password: undefined });
+      const plainPassword = process.env.DEFAULT_SEEDED_PASSWORD || 'TempPass123!';
+      const hashed = await bcrypt.hash(plainPassword, 10);
+      user = await User.create({ firstName, lastName, email, password: hashed });
       console.log(`[seedForName] Created user ${firstName} ${lastName} with email ${email} (_id=${user._id})`);
+      console.log(`[seedForName] INITIAL PASSWORD: ${plainPassword}`);
     } else {
+      // If user exists but has no password (e.g. earlier seeding), set one so login works.
+      if (!user.password) {
+        const plainPassword = process.env.DEFAULT_SEEDED_PASSWORD || 'TempPass123!';
+        user.password = await bcrypt.hash(plainPassword, 10);
+        await user.save();
+        console.log(`[seedForName] Added password to existing user. INITIAL PASSWORD: ${plainPassword}`);
+      }
       console.log(`[seedForName] Using existing user ${firstName} ${lastName} (_id=${user._id}, email=${user.email})`);
     }
 

@@ -4,12 +4,18 @@ import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { ExternalLink } from "lucide-react";
 
 const UserProfileCard = () => {
-  // Mock data - in real app this would come from LinkedIn API or local storage
+  // Attempt to load user from localStorage (set after login/register)
+  let stored: any = null;
+  try { stored = JSON.parse(localStorage.getItem('authUser') || 'null'); } catch {}
+  const firstName = stored?.firstName || stored?.fullName?.split(' ')[0];
+  const lastName = stored?.lastName || (stored?.fullName?.split(' ').slice(1).join(' ') || '');
+  const fullName = stored ? [firstName, lastName].filter(Boolean).join(' ') : 'Guest User';
+  const initials = (firstName?.[0] || '') + (lastName?.[0] || '');
   const userProfile = {
-    fullName: "Alex Johnson",
-    title: "job seeker",
-    profileImage: "/api/placeholder/120/120", // placeholder image
-    initials: "AJ"
+    fullName,
+    title: 'job seeker',
+    profileImage: '/api/placeholder/120/120',
+    initials: initials.toUpperCase() || 'GU'
   };
 
   return (

@@ -63,8 +63,16 @@ async function create(req, res) {
     const app = await Application.create({ ...body, userId });
     res.status(201).json(app.toJSON());
   } catch (err) {
-    console.error('Create application error', err);
-    res.status(400).json({ error: err.message || 'Failed to create application' });
+    console.error('Create application error', {
+      message: err.message,
+      name: err.name,
+      code: err.code,
+      stack: err.stack,
+      body: req.body
+    });
+    // Differentiate validation vs other errors (also include CastError)
+    const status = (err.name === 'ValidationError' || err.name === 'CastError') ? 422 : 400;
+    res.status(status).json({ error: err.message || 'Failed to create application' });
   }
 }
 
@@ -80,8 +88,16 @@ async function update(req, res) {
     if (!app) return res.status(404).json({ error: 'Not found' });
     res.json(app.toJSON());
   } catch (err) {
-    console.error('Update application error', err);
-    res.status(400).json({ error: err.message || 'Failed to update application' });
+    console.error('Update application error', {
+      message: err.message,
+      name: err.name,
+      code: err.code,
+      stack: err.stack,
+      body: req.body,
+      id: req.params.id
+    });
+    const status = (err.name === 'ValidationError' || err.name === 'CastError') ? 422 : 400;
+    res.status(status).json({ error: err.message || 'Failed to update application' });
   }
 }
 
@@ -120,6 +136,41 @@ function sanitizeBody(body, partial = false) {
   for (const key of allowed) {
     if (body[key] !== undefined) out[key] = body[key];
   }
+
+  // Normalize empty strings to undefined for optional fields that are typed.
+  ['appliedAt', 'nextActionDate', 'offerComp', 'rejectionReason', 'jobUrl', 'location', 'tailoringNotes', 'nextAction'].forEach(k => {
+    if (out[k] === '') delete out[k];
+  });
+
+  // Dates: ensure valid or remove
+  ['appliedAt', 'nextActionDate'].forEach(k => {
+    if (out[k]) {
+      const d = new Date(out[k]);
+      if (isNaN(d.getTime())) delete out[k];
+      else out[k] = d; // store as Date
+    }
+  });
+
+  // Match score: ensure number within range
+  if (out.matchScore !== undefined) {
+    const n = Number(out.matchScore);
+    if (Number.isNaN(n) || n < 0 || n > 100) {
+      throw new Error('matchScore must be a number between 0 and 100');
+    }
+    out.matchScore = n;
+  }
+
+  // Technologies: ensure array of strings
+  if (out.technologies !== undefined) {
+    if (!Array.isArray(out.technologies)) {
+      throw new Error('technologies must be an array');
+    }
+    out.technologies = out.technologies.map(t => String(t)).filter(Boolean);
+  }
+
+  // Resume: drop empty strings
+  if (out.resumeId === '') delete out.resumeId;
+
   if (!partial) {
     if (!out.company) throw new Error('company is required');
     if (!out.roleTitle) throw new Error('roleTitle is required');
