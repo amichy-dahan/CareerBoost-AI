@@ -31,7 +31,9 @@ const applicationSchema = new Schema({
   jobUrl: { type: String, trim: true },
   status: { type: String, enum: STATUS_VALUES, default: 'Draft', index: true },
   appliedAt: { type: Date },
-  resumeId: { type: Schema.Types.ObjectId }, // placeholder for relation to a Resume collection (not defined yet)
+  // Temporarily store resumeId as a String since the frontend uses mock IDs like 'resume1'.
+  // When a real Resume collection exists, convert to Schema.Types.ObjectId and migrate values.
+  resumeId: { type: String },
   matchScore: { type: Number, min: 0, max: 100 }, // percentage match AI maybe calculates
   technologies: [{ type: String, trim: true }],
   tailoringNotes: { type: String },
