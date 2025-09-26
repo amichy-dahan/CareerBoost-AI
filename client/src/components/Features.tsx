@@ -4,13 +4,13 @@ import { Target, TrendingUp, Sparkles } from "lucide-react";
 const Features = () => {
   const features = [{
     icon: Target,
-    title: "Application Tracking & Insights",
+    title: "Application Tracking & Insights2",
     description: "Organize all your job applications in one place and never miss a step.",
     benefits: ["Track statuses and deadlines", "Monitor match scores", "Stay ready for upcoming interviews"],
     color: "text-green-600"
   }, {
     icon: TrendingUp,
-    title: "Progress Tracking",
+    title: "Progress Tracking chack",
     description: "See how your job search improves over time with clear analytics and reminders.",
     benefits: ["Weekly goals vs. actuals", "Stage conversion (Applied → Interview)", "Overdue or missing actions"],
     color: "text-purple-600"
