@@ -39,7 +39,6 @@ export const ApplicationDrawer = ({ application, open, onOpenChange, onSave }) =
     appliedAt: application?.appliedAt || '',
     nextAction: application?.nextAction || '',
     nextActionDate: application?.nextActionDate || '',
-    matchScore: application?.matchScore || undefined,
     tailoringNotes: application?.tailoringNotes || '',
     technologies: application?.technologies || [],
     offerComp: application?.offerComp || '',
@@ -58,7 +57,6 @@ export const ApplicationDrawer = ({ application, open, onOpenChange, onSave }) =
       appliedAt: application?.appliedAt || '',
       nextAction: application?.nextAction || '',
       nextActionDate: application?.nextActionDate || '',
-      matchScore: application?.matchScore || undefined,
       tailoringNotes: application?.tailoringNotes || '',
       technologies: application?.technologies || [],
       offerComp: application?.offerComp || '',
@@ -253,18 +251,6 @@ export const ApplicationDrawer = ({ application, open, onOpenChange, onSave }) =
                     type="date"
                     value={formData.appliedAt}
                     onChange={(e) => setFormData(prev => ({ ...prev, appliedAt: e.target.value }))}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="matchScore">Match Score</Label>
-                  <Input
-                    id="matchScore"
-                    type="number"
-                    min="0"
-                    max="100"
-                    placeholder="0-100"
-                    value={formData.matchScore || ''}
-                    onChange={(e) => setFormData(prev => ({ ...prev, matchScore: e.target.value ? parseInt(e.target.value) : undefined }))}
                   />
                 </div>
               </div>
