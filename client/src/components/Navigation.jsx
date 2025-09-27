@@ -37,15 +37,13 @@ const Navigation = () => {
           <span className="text-xl font-bold text-slate-950">CareerBoost</span>
         </div>
    
-          
-
         {!isLanding && (
           <>
-            <div className="hidden md:flex items-center space-x-8">
+            <div className="hidden md:flex items-center">
               <NavLink
                 to="/dashboard"
                 className={({ isActive }) =>
-                  `transition-colors mx-[9px] border-b-2 ${
+                  `transition-colors px-4 py-2 mx-2 rounded-md border-b-2 ${
                     isActive
                       ? "font-bold text-foreground border-blue-500"
                       : "text-muted-foreground hover:text-foreground border-transparent"
@@ -57,7 +55,7 @@ const Navigation = () => {
               <NavLink
                 to="/applications"
                 className={({ isActive }) =>
-                  `transition-colors mx-[20px] border-b-2 ${
+                  `transition-colors px-4 py-2 mx-2 rounded-md border-b-2 ${
                     isActive
                       ? "font-bold text-foreground border-blue-500"
                       : "text-muted-foreground hover:text-foreground border-transparent"
@@ -69,7 +67,7 @@ const Navigation = () => {
               <NavLink
                 to="/resume"
                 className={({ isActive }) =>
-                  `transition-colors border-b-2 ${
+                  `transition-colors px-4 py-2 mx-2 rounded-md border-b-2 ${
                     isActive
                       ? "font-bold text-foreground border-blue-500"
                       : "text-muted-foreground hover:text-foreground border-transparent"
