@@ -31,8 +31,21 @@ async function login(req, res, next) {
 async function register(req, res, next) {
     try {
         const { full_name, email, password } = req.body;
-        const newUser = await AuthNodel.register(full_name, email, password);
-        res.status(201).json({ message: "User registered successfully", user: newUser });
+        const user = await AuthNodel.register(full_name, email, password);
+
+            const token = jwt.sign(
+            { id: user._id, email: user.email },
+            process.env.JWT_SECRET,
+            { expiresIn: "1h" }
+        );
+
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            maxAge: 1000 * 60 * 60 // שעה
+        });
+        res.status(201).json({ message: "User registered successfully", user });
     } catch (err) {
         console.error(err);
         const statusCode = err.status || 400;
