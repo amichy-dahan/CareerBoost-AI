@@ -26,8 +26,9 @@ export default function ResumeHubPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                Fill a short form and let AI draft an ATS-friendly résumé.
+                Fill a short form and let AI draft a perfect résumé.
               </p>
+              <br></br>
               <Separator />
               <div className="flex justify-end">
                 <Button asChild>
@@ -54,7 +55,7 @@ export default function ResumeHubPage() {
               </p>
               <Separator />
               <div className="flex justify-end">
-                <Button asChild variant="secondary">
+                <Button asChild >
                   <Link to="/resume/improve">
                     <Sparkles className="h-4 w-4 mr-2" />
                     Open Improver
