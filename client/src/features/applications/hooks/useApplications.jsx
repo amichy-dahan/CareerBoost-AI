@@ -22,7 +22,7 @@ export const useApplications = (filters = {}, page = 1, pageSize = 20) => {
         if (filters.status?.length) params.set('status', filters.status.join(','));
         if (filters.source) params.set('source', filters.source);
         if (filters.technologies?.length) params.set('technologies', filters.technologies.join(','));
-        const res = await fetch(`/api/applications?${params.toString()}`, {
+        const res = await fetch(`https://careerboost-ai-al0j.onrender.comv/applications?${params.toString()}`, {
           credentials: 'include',
           signal: controller.signal
         });
@@ -54,7 +54,7 @@ export const useApplication = (id) => {
       setIsLoading(true);
       setError(null);
       try {
-        const res = await fetch(`/api/applications/${id}`, { credentials: 'include', signal: controller.signal });
+        const res = await fetch(`https://careerboost-ai-al0j.onrender.com/applications/${id}`, { credentials: 'include', signal: controller.signal });
         if (!res.ok) throw new Error('Failed to load application');
         const json = await res.json();
         setData(json);

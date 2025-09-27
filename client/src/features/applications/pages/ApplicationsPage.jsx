@@ -44,7 +44,7 @@ const ApplicationsPage = () => {
   };
   const handleDeleteApplication = async (applicationId) => {
     try {
-      const res = await fetch(`/api/applications/${applicationId}`, {
+      const res = await fetch(`https://careerboost-ai-al0j.onrender.com/applications/${applicationId}`, {
         method: 'DELETE',
         credentials: 'include'
       });
