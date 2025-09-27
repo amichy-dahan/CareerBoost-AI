@@ -22,7 +22,7 @@ export const useApplications = (filters = {}, page = 1, pageSize = 20) => {
         if (filters.status?.length) params.set('status', filters.status.join(','));
         if (filters.source) params.set('source', filters.source);
         if (filters.technologies?.length) params.set('technologies', filters.technologies.join(','));
-        const res = await fetch(`https://careerboost-ai-al0j.onrender.comv/applications?${params.toString()}`, {
+        const res = await fetch(`https://careerboost-ai-al0j.onrender.com/applications?${params.toString()}`, {
           credentials: 'include',
           signal: controller.signal
         });
