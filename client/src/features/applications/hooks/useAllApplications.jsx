@@ -31,7 +31,7 @@ export const useAllApplications = () => {
         let total = Infinity;
         while (!cancelled && collected.length < total) {
           const params = new URLSearchParams({ page: String(page), pageSize: String(PAGE_SIZE) });
-          const res = await fetch(`/api/applications?${params.toString()}`, { credentials: 'include', signal: controller.signal });
+          const res = await fetch(`https://careerboost-ai-al0j.onrender.com/applications?${params.toString()}`, { credentials: 'include', signal: controller.signal });
           if (!res.ok) throw new Error(`Failed to load applications page ${page} (${res.status})`);
           const json = await res.json();
           total = json.total || 0;

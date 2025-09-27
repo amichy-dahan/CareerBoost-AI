@@ -110,7 +110,7 @@ const Dashboard = () => {
     let cancelled = false;
     (async () => {
       try {
-        const res = await fetch('/api/user/progress', { credentials: 'include' });
+        const res = await fetch('https://careerboost-ai-al0j.onrender.com/user/progress', { credentials: 'include' });
         if (!res.ok) throw new Error('Failed to load progress');
         const data = await res.json();
         if (!cancelled) {
@@ -145,7 +145,7 @@ const Dashboard = () => {
     setCompletedActionIds(prev => new Set(prev).add(item.id));
 
     try {
-      await fetch('/api/user/progress/complete', {
+      await fetch('https://careerboost-ai-al0j.onrender.com/user/progress/complete', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
