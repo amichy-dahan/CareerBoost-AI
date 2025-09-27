@@ -4,7 +4,7 @@ const { authenticate } = require('../middellwares/authenticate');
 const User = require('../models/User');
 
 // All progress routes require auth
-
+router.use(authenticate);
 
 // GET current user's score + completed actions
 router.get('/', async (req, res) => {

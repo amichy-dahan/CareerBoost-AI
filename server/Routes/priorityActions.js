@@ -3,7 +3,7 @@ const router = express.Router();
 const { authenticate } = require('../middellwares/authenticate');
 const Application = require('../models/Application');
 
-router.get('/', async (req, res) => {
+router.get('/', authenticate, async (req, res) => {
   try {
     const userId = req.user.id;
     const apps = await Application.find({ userId })
