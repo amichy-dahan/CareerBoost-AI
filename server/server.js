@@ -89,7 +89,7 @@ const applicationsRouter = require('./Routes/applications');
 const userProgressRouter = require('./Routes/userProgress');
 const priorityActionsRouter = require('./Routes/priorityActions');
 app.use("/api/feedback", feedbackRouter);
-app.use('/api/applications', applicationsRouter);
+app.use('/applications', applicationsRouter);
 app.use('/api/user/progress', userProgressRouter);
 app.use('/api/priority-actions', priorityActionsRouter);
 
