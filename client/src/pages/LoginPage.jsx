@@ -3,18 +3,20 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import loginIllustration from "@/assets/login-illustration.png";
-
 // const prod = false;
 const serverUrl ="https://careerboost-ai-al0j.onrender.com";
-import { withApi } from "@/lib/apiConfig";
 
 import axios from "axios";
 const LoginPage = () => {
   const navigate = useNavigate();
   const [error, setError] = useState("");
   const [isLogin, setIsLogin] = useState(true);
-  const [formData, setFormData] = useState({ firstName: "", lastName: "", email: "", password: "" });
-  const [submitting, setSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: ""
+  });
   useEffect(() => {
     const hash = window.location.hash;
     const params = new URLSearchParams(hash.split("?")[1]);
@@ -33,40 +35,41 @@ const LoginPage = () => {
     console.log("Form submitted:", formData);
   };
 
-  const handlelogin = async () => {
-    if (submitting) return;
-    setSubmitting(true);
+  const handlelogin = async (flow) => {
     try {
-      let resp;
-      if (isLogin) {
-        resp = await axios.post(withApi('/users/login'), { email: formData.email, password: formData.password }, { withCredentials: true });
+      if (flow === "Sing in") {
+        const response = await axios.post(`${serverUrl}/users/login`, {
+          email: formData.email,
+          password: formData.password
+        }, { withCredentials: true });
+        console.log(response.data);
+        navigate("/dashboard");
       } else {
-        resp = await axios.post(withApi('/users/register'), { full_name: formData.firstName + ' ' + formData.lastName, email: formData.email, password: formData.password }, { withCredentials: true });
+        const response = await axios.post(`${serverUrl}/users/register`, {
+          full_name: formData.firstName + " " + formData.lastName,
+          email: formData.email,
+          password: formData.password
+        }, { withCredentials: true });
+        console.log(response.data);
+        navigate("/dashboard");
       }
-      if (resp?.data?.user) {
-        try { localStorage.setItem('authUser', JSON.stringify(resp.data.user)); } catch {}
-      }
-      // Optionally verify cookie/token before navigating (non-blocking)
-      try { await axios.get(withApi('/auth/check'), { withCredentials: true }); } catch {}
-      navigate('/dashboard', { replace: true });
+
     } catch (error) {
       if (error.response && error.response.data) {
         if (error.response.data.errors) {
-          setError(error.response.data.errors[0].msg);
+          alert(error.response.data.errors[0].msg);
         } else if (error.response.data.error) {
-          setError(error.response.data.error);
+          alert(error.response.data.error);
         }
       } else {
-        setError('Network error');
+        alert("Network error");
       }
-    } finally {
-      setSubmitting(false);
     }
-  };
+  }
   const handleLinkedIn = async (flow) => {
     try {
       console.log(flow);
-      const { data } = await axios.get(withApi('/auth/linkedin'), {
+      const { data } = await axios.get(`${serverUrl}/auth/linkedin`, {
         withCredentials: true,
         params: { flow },
       });
@@ -143,8 +146,8 @@ const LoginPage = () => {
             </button>
           </div>}
 
-          <Button onClick={handlelogin} type="submit" disabled={submitting} className="w-full h-12 bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 disabled:opacity-60 text-primary-foreground font-semibold mx-0 py-[21px] my-[29px]">
-            {submitting ? (isLogin ? 'Signing in...' : 'Creating...') : (isLogin ? 'Sign in' : 'Create account')}
+          <Button onClick={() => handlelogin(isLogin ? "Sing in" : "Create")} type="submit" className="w-full h-12 bg-gradient-to-r from-primary to-primary-glow hover:opacity-90 text-primary-foreground font-semibold mx-0 py-[21px] my-[29px]">
+            {isLogin ? "Sign in" : "Create account"}
           </Button>
         </form>
 
