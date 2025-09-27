@@ -41,7 +41,7 @@ const Dashboard = () => {
           title: 'Prepare for upcoming interview',
           description: `You have a technical interview at ${app.company} on ${new Date(app.nextActionDate).toLocaleDateString('en-US',{month:'short',day:'numeric'})}. Review system design topics.`,
           priority: 'High',
-            impact: '+15 pts',
+          impact: '+15 pts',
           icon: AlertCircle,
           color: 'text-destructive'
         });

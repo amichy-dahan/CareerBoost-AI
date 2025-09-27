@@ -72,7 +72,7 @@ const ApplicationsPage = () => {
   const handleSaveApplication = async (applicationData) => {
     const isEditing = Boolean(editingApplication?.id);
     try {
-      const res = await fetch(`/api/applications${isEditing ? `/${editingApplication.id}` : ''}`, {
+      const res = await fetch(`https://careerboost-ai-al0j.onrender.com/applications${isEditing ? `/${editingApplication.id}` : ''}`, {
         method: isEditing ? 'PUT' : 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
