@@ -35,7 +35,7 @@ export default function ResumeImproverPage() {
     setIsAnalyzing(true);
     setFeedback(null);
     try {
-      const resp = await fetch(`/api/feedback/${profileId}`, {
+      const resp = await fetch(`https://careerboost-ai-al0j.onrender.com/feedback/${profileId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ resumeText, jobDescription }),

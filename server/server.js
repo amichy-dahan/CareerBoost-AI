@@ -88,7 +88,7 @@ const feedbackRouter = require("./Routes/feedback");
 const applicationsRouter = require('./Routes/applications');
 const userProgressRouter = require('./Routes/userProgress');
 const priorityActionsRouter = require('./Routes/priorityActions');
-app.use("/api/feedback", feedbackRouter);
+app.use("/feedback", feedbackRouter);
 app.use('/applications', applicationsRouter);
 app.use('/user/progress', userProgressRouter);
 app.use('/priority-actions', priorityActionsRouter);
