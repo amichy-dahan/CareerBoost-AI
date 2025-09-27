@@ -74,7 +74,7 @@ const Navigation = () => {
                   }`
                 }
               >
-                Resume Improver
+                Resume Tools
               </NavLink>
             </div>
 
@@ -118,14 +118,14 @@ const Navigation = () => {
                         Applications
                       </NavLink>
                       <NavLink
-                        to="/generate-resume"
+                        to="/resume"
                         className={({ isActive }) =>
                           `px-6 py-4 hover:bg-accent hover:text-accent-foreground border-b-2 ${
                             isActive ? "font-bold border-blue-500" : "border-transparent"
                           }`
                         }
                       >
-                        Generate Resume
+                        Resume Tools
                       </NavLink>
                       <button
                         onClick={handleLogout}
