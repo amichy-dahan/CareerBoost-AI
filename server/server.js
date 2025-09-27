@@ -93,8 +93,12 @@ app.get('/health/db', (req, res) => {
 
 const feedbackRouter = require("./Routes/feedback");
 const applicationsRouter = require('./Routes/applications');
+const userProgressRouter = require('./Routes/userProgress');
+const priorityActionsRouter = require('./Routes/priorityActions');
 app.use("/api/feedback", feedbackRouter);
 app.use('/api/applications', applicationsRouter);
+app.use('/api/user/progress', userProgressRouter);
+app.use('/api/priority-actions', priorityActionsRouter);
 
 // Central error handler (including CORS rejections) before DB start message
 app.use((err, req, res, next) => {

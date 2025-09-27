@@ -5,6 +5,21 @@ import { ArrowUpRight, Calendar, CheckCircle, AlertCircle, Clock, Star } from "l
 import UserProfileCard from "./UserProfileCard";
 import { useApplications } from "@/features/applications/hooks/useApplications";
 import { useAllApplications } from "@/features/applications/hooks/useAllApplications";
+import { useState, useMemo, useEffect } from "react";
+
+interface PriorityAction {
+  id: string;
+  title: string;
+  description: string;
+  priority: 'High' | 'Medium' | 'Low';
+  impact: string; // e.g. "+15 pts"
+  icon: any; // Lucide icon component
+  color: string;
+}
+
+// Helper to produce a stable application id (avoid Math.random each render)
+const getStableAppId = (app: any, idx: number) =>
+  app.id || app._id || app.applicationId || app.company || `app-${idx}`;
 const Dashboard = () => {
   // Keep lightweight first page fetch for immediate UI (recent activity & actions use)
   const { data: applicationsData } = useApplications();
@@ -13,80 +28,139 @@ const Dashboard = () => {
   const { applications: allApplications, isLoading: isLoadingAll } = useAllApplications();
   const applications = allApplications.length ? allApplications : firstPageApplications;
 
-  // Generate priority actions from applications data
-  const actionItems = [];
-  applications.forEach(app => {
-    // High priority: Upcoming interviews
-    if (app.status === 'Tech Interview 1' || app.status === 'Tech Interview 2' || app.status === 'Final/Onsite') {
-      actionItems.push({
-        title: "Prepare for upcoming interview",
-        description: `You have a technical interview at ${app.company} on ${new Date(app.nextActionDate).toLocaleDateString('en-US', {
-          month: 'short',
-          day: 'numeric'
-        })}. Review system design topics.`,
-        priority: "High",
-        impact: "+15 pts",
-        icon: AlertCircle,
-        color: "text-destructive"
-      });
-    }
-
-    // Medium priority: Follow-ups needed
-    if (app.status === 'Applied' && app.appliedAt) {
-      const daysSinceApplied = Math.floor((Date.now() - new Date(app.appliedAt).getTime()) / (1000 * 60 * 60 * 24));
-      if (daysSinceApplied >= 5 && daysSinceApplied <= 10) {
-        actionItems.push({
-          title: "Follow up on recent application",
-          description: `Your application to ${app.company} was sent on ${new Date(app.appliedAt).toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric'
-          })}. Follow up with recruiter by ${new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric'
-          })}.`,
-          priority: "Medium",
-          impact: "+8 pts",
-          icon: Clock,
-          color: "text-primary"
+  // Build full action list (memoized)
+  const allActionItems = useMemo<PriorityAction[]>(() => {
+    if (!applications.length) return [];
+    const list: PriorityAction[] = [];
+    applications.forEach((app, idx) => {
+      const appId = getStableAppId(app, idx);
+      // High priority interview prep
+      if (['Tech Interview 1','Tech Interview 2','Final/Onsite'].includes(app.status) && app.nextActionDate) {
+        list.push({
+          id: `${appId}-interview-${app.status}`,
+          title: 'Prepare for upcoming interview',
+          description: `You have a technical interview at ${app.company} on ${new Date(app.nextActionDate).toLocaleDateString('en-US',{month:'short',day:'numeric'})}. Review system design topics.`,
+          priority: 'High',
+            impact: '+15 pts',
+          icon: AlertCircle,
+          color: 'text-destructive'
         });
       }
-    }
+      // Follow up window
+      if (app.status === 'Applied' && app.appliedAt) {
+        const days = Math.floor((Date.now() - new Date(app.appliedAt).getTime())/86400000);
+        if (days >= 5 && days <= 10) {
+          list.push({
+            id: `${appId}-followup-${days}`,
+            title: 'Follow up on recent application',
+            description: `Applied to ${app.company} on ${new Date(app.appliedAt).toLocaleDateString('en-US',{month:'short',day:'numeric'})}. Send a follow-up soon.`,
+            priority: 'Medium',
+            impact: '+8 pts',
+            icon: Clock,
+            color: 'text-primary'
+          });
+        }
+      }
+      // Low match score improvement
+      if (app.matchScore && app.matchScore < 75) {
+        list.push({
+          id: `${appId}-lowmatch-${app.matchScore}`,
+          title: 'Improve low match score',
+          description: `Application to ${app.company} scored ${app.matchScore}%. Highlight key skills.`,
+          priority: 'Medium',
+          impact: '+10 pts',
+          icon: Clock,
+          color: 'text-primary'
+        });
+      }
+      // Missing next action
+      if (!app.nextAction || !app.nextAction.trim()) {
+        list.push({
+          id: `${appId}-missing-next`,
+          title: 'Add next action',
+          description: `${app.company} has no next step defined. Add one.`,
+          priority: 'Low',
+          impact: '+3 pts',
+          icon: CheckCircle,
+          color: 'text-success'
+        });
+      }
+    });
+    return list;
+  }, [applications]);
 
-    // Medium priority: Low match scores
-    if (app.matchScore && app.matchScore < 75) {
-      const techsString = app.technologies?.slice(0, 2).join(' + ') || 'relevant skills';
-      actionItems.push({
-        title: "Improve low match score",
-        description: `Your application to ${app.company} scored ${app.matchScore}%. Update your résumé to highlight ${techsString}.`,
-        priority: "Medium",
-        impact: "+10 pts",
-        icon: Clock,
-        color: "text-primary"
+  // Sort actions once per change
+  const sortedActions = useMemo(() => {
+    const priorityOrder: Record<string, number> = { High: 3, Medium: 2, Low: 1 };
+    return [...allActionItems].sort((a,b) => priorityOrder[b.priority]-priorityOrder[a.priority]);
+  }, [allActionItems]);
+
+  // Completed
+  const [completedActionIds, setCompletedActionIds] = useState<Set<string>>(new Set());
+  // Remaining pool after completions
+  const [priorityPool, setPriorityPool] = useState<PriorityAction[]>([]);
+  // Currently visible (top 3)
+  const [visibleActions, setVisibleActions] = useState<PriorityAction[]>([]);
+  const [userScore, setUserScore] = useState<number>(0);
+  const [isLoadingProgress, setIsLoadingProgress] = useState<boolean>(true);
+  const [progressError, setProgressError] = useState<string | null>(null);
+
+  // Load persisted progress (score + completed actions)
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch('/api/user/progress', { credentials: 'include' });
+        if (!res.ok) throw new Error('Failed to load progress');
+        const data = await res.json();
+        if (!cancelled) {
+          setUserScore(data.careerScore || 0);
+          if (Array.isArray(data.completedPriorityActions)) {
+            setCompletedActionIds(new Set(data.completedPriorityActions));
+          }
+        }
+      } catch (e: any) {
+        if (!cancelled) setProgressError(e.message || 'Error loading progress');
+      } finally {
+        if (!cancelled) setIsLoadingProgress(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, []);
+
+  // Rebuild pool and visible when sorted list or completions change
+  useEffect(() => {
+    const remaining = sortedActions.filter(a => !completedActionIds.has(a.id));
+    setPriorityPool(remaining);
+    setVisibleActions(remaining.slice(0,3));
+  }, [sortedActions, completedActionIds]);
+
+  const handleCompleteAction = async (item: PriorityAction) => {
+    if (!item) return;
+    const match = item.impact.match(/[-+]?\d+/);
+    const points = match ? parseInt(match[0], 10) : 0;
+
+    // Optimistic update
+    setUserScore(s => s + points);
+    setCompletedActionIds(prev => new Set(prev).add(item.id));
+
+    try {
+      await fetch('/api/user/progress/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ actionId: item.id, points })
+      });
+    } catch (e) {
+      // Rollback on failure
+      setUserScore(s => s - points);
+      setCompletedActionIds(prev => {
+        const next = new Set(prev);
+        next.delete(item.id);
+        return next;
       });
     }
-
-    // Low priority: Missing next actions
-    if (!app.nextAction || app.nextAction.trim() === '') {
-      actionItems.push({
-        title: "Add next action",
-        description: `${app.company} application has no next step defined. Add a follow-up or preparation task.`,
-        priority: "Low",
-        impact: "+3 pts",
-        icon: CheckCircle,
-        color: "text-success"
-      });
-    }
-  });
-
-  // Take top 3 priority actions
-  const sortedActions = actionItems.sort((a, b) => {
-    const priorityOrder = {
-      High: 3,
-      Medium: 2,
-      Low: 1
-    };
-    return priorityOrder[b.priority] - priorityOrder[a.priority];
-  }).slice(0, 3);
+  };
 
   // Calculate career readiness metrics
   const averageMatchScore = applications.length > 0 ? Math.round(applications.reduce((sum, app) => sum + (app.matchScore || 0), 0) / applications.length) : 0;
@@ -139,7 +213,7 @@ const Dashboard = () => {
           {/* Main Dashboard */}
           <div className="lg:col-span-2 space-y-6">
             {/* User Profile Card */}
-            <UserProfileCard />
+            <UserProfileCard score={userScore} />
             
             <Card>
               <CardHeader>
@@ -217,7 +291,7 @@ const Dashboard = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {sortedActions.length > 0 ? sortedActions.map((item, index) => <div key={index} className="border border-border rounded-lg p-4">
+                    {visibleActions.length > 0 ? visibleActions.map((item) => <div key={item.id} className="border border-border rounded-lg p-4">
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center">
                         <item.icon className={`w-4 h-4 mr-2 ${item.color}`} />
@@ -229,8 +303,8 @@ const Dashboard = () => {
                     </div>
                     <h4 className="font-medium text-sm mb-1">{item.title}</h4>
                     <p className="text-xs text-muted-foreground mb-3">{item.description}</p>
-                    <Button size="sm" variant="outline" className="w-full text-xs">
-                      Take Action
+                    <Button size="sm" variant="outline" className="w-full text-xs" onClick={() => handleCompleteAction(item)}>
+                      Done
                     </Button>
                   </div>) : <div className="text-center py-4">
                     <p className="text-sm text-muted-foreground">No priority actions</p>
