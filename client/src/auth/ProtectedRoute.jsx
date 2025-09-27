@@ -5,8 +5,10 @@ import axios from "axios";
 function ProtectedRoute({ children }) {
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
+
   const [error, setError] = useState(null);
-  const serverUrl = "https://careerboost-ai-al0j.onrender.com"; // keep render base
+  const serverUrl ="https://careerboost-ai-al0j.onrender.com"; // keep render base
+
 
   useEffect(() => {
     let cancelled = false;

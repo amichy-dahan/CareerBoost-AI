@@ -3,28 +3,27 @@ import { Menu } from "lucide-react";
 import { NavLink, useNavigate, useLocation } from "react-router-dom"; // added useLocation, removed unused Link
 import { Sheet, SheetContent, SheetHeader, SheetTrigger } from "@/components/ui/sheet";
 import { useState, useEffect } from "react";
-
+import axios from "axios";
+const serverUrl="https://careerboost-ai-al0j.onrender.com";
 const Navigation = () => {
   const [isAuthed, setIsAuthed] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const isLanding = location.pathname === "/";
 
-  useEffect(() => {
-    const readAuth = () => {
-      const token = localStorage.getItem("auth_token") || localStorage.getItem("token");
-      setIsAuthed(!!token);
-    };
-    readAuth();
-    window.addEventListener("storage", readAuth);
-    return () => window.removeEventListener("storage", readAuth);
-  }, []);
 
-  const handleLogout = () => {
-    localStorage.removeItem("auth_token");
-    localStorage.removeItem("token");
-    setIsAuthed(false);
-    navigate("/");
+  const handleLogout = async () => {
+    try {
+      await axios.post(
+        `${serverUrl}/users/logout`,
+        {}, 
+        { withCredentials: true } 
+      );
+
+      navigate("/");
+    } catch (err) {
+      console.error("Logout failed:", err);
+    }
   };
 
   return (
@@ -145,6 +144,7 @@ const Navigation = () => {
       </div>
     </nav>
   );
+
 };
 
 export default Navigation;

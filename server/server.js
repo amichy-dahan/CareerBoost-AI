@@ -47,15 +47,8 @@ const allowedOrigins = Array.from(new Set([
 ]));
 console.log('[CORS] Allowed origins:', allowedOrigins);
 app.use(cors({
-  origin: (origin, cb) => {
-    if (!origin) return cb(null, true); // non-browser (curl, server-side)
-    if (allowedOrigins.includes(origin)) return cb(null, true);
-    console.warn('[CORS] Blocked origin:', origin);
-    return cb(new Error('Not allowed by CORS'));
-  },
-  credentials: true,
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS']
+  origin: process.env.PROD === "true"? `https://careerboost-ai-1.onrender.com`:`http://localhost:8080`,
+  credentials: true 
 }));
 
 app.use('/users', router);

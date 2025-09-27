@@ -3,7 +3,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import loginIllustration from "@/assets/login-illustration.png";
+
+// const prod = false;
+const serverUrl ="https://careerboost-ai-al0j.onrender.com";
 import { withApi } from "@/lib/apiConfig";
+
 import axios from "axios";
 const LoginPage = () => {
   const navigate = useNavigate();
