@@ -13,13 +13,9 @@ interface PriorityAction {
   description: string;
   priority: 'High' | 'Medium' | 'Low';
   impact: string; // e.g. "+15 pts"
-  icon: any; // Lucide icon component
+  icon: any;
   color: string;
 }
-
-// Helper to produce a stable application id (avoid Math.random each render)
-const getStableAppId = (app: any, idx: number) =>
-  app.id || app._id || app.applicationId || app.company || `app-${idx}`;
 const Dashboard = () => {
   // Keep lightweight first page fetch for immediate UI (recent activity & actions use)
   const { data: applicationsData } = useApplications();
@@ -28,79 +24,86 @@ const Dashboard = () => {
   const { applications: allApplications, isLoading: isLoadingAll } = useAllApplications();
   const applications = allApplications.length ? allApplications : firstPageApplications;
 
-  // Build full action list (memoized)
-  const allActionItems = useMemo<PriorityAction[]>(() => {
-    if (!applications.length) return [];
-    const list: PriorityAction[] = [];
-    applications.forEach((app, idx) => {
-      const appId = getStableAppId(app, idx);
-      // High priority interview prep
-      if (['Tech Interview 1','Tech Interview 2','Final/Onsite'].includes(app.status) && app.nextActionDate) {
-        list.push({
-          id: `${appId}-interview-${app.status}`,
-          title: 'Prepare for upcoming interview',
-          description: `You have a technical interview at ${app.company} on ${new Date(app.nextActionDate).toLocaleDateString('en-US',{month:'short',day:'numeric'})}. Review system design topics.`,
-          priority: 'High',
-            impact: '+15 pts',
-          icon: AlertCircle,
-          color: 'text-destructive'
-        });
-      }
-      // Follow up window
-      if (app.status === 'Applied' && app.appliedAt) {
-        const days = Math.floor((Date.now() - new Date(app.appliedAt).getTime())/86400000);
-        if (days >= 5 && days <= 10) {
-          list.push({
-            id: `${appId}-followup-${days}`,
-            title: 'Follow up on recent application',
-            description: `Applied to ${app.company} on ${new Date(app.appliedAt).toLocaleDateString('en-US',{month:'short',day:'numeric'})}. Send a follow-up soon.`,
-            priority: 'Medium',
-            impact: '+8 pts',
-            icon: Clock,
-            color: 'text-primary'
-          });
-        }
-      }
-      // Low match score improvement
-      if (app.matchScore && app.matchScore < 75) {
-        list.push({
-          id: `${appId}-lowmatch-${app.matchScore}`,
-          title: 'Improve low match score',
-          description: `Application to ${app.company} scored ${app.matchScore}%. Highlight key skills.`,
-          priority: 'Medium',
-          impact: '+10 pts',
+  // Generate ALL potential priority actions from applications data (unfiltered; we slice later)
+  const allActionItems: PriorityAction[] = [];
+  applications.forEach(app => {
+    const appId = app.id || app._id || app.applicationId || app.company || Math.random().toString(36).slice(2);
+    // High priority: Upcoming interviews
+    if (app.status === 'Tech Interview 1' || app.status === 'Tech Interview 2' || app.status === 'Final/Onsite') {
+      allActionItems.push({
+        id: `${appId}-interview-${app.status}`,
+        title: "Prepare for upcoming interview",
+        description: `You have a technical interview at ${app.company} on ${new Date(app.nextActionDate).toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric'
+        })}. Review system design topics.`,
+        priority: "High",
+        impact: "+15 pts",
+        icon: AlertCircle,
+        color: "text-destructive"
+      });
+    }
+
+    // Medium priority: Follow-ups needed
+    if (app.status === 'Applied' && app.appliedAt) {
+      const daysSinceApplied = Math.floor((Date.now() - new Date(app.appliedAt).getTime()) / (1000 * 60 * 60 * 24));
+      if (daysSinceApplied >= 5 && daysSinceApplied <= 10) {
+        allActionItems.push({
+          id: `${appId}-followup-${daysSinceApplied}`,
+          title: "Follow up on recent application",
+          description: `Your application to ${app.company} was sent on ${new Date(app.appliedAt).toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric'
+          })}. Follow up with recruiter by ${new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric'
+          })}.`,
+          priority: "Medium",
+          impact: "+8 pts",
           icon: Clock,
-          color: 'text-primary'
+          color: "text-primary"
         });
       }
-      // Missing next action
-      if (!app.nextAction || !app.nextAction.trim()) {
-        list.push({
-          id: `${appId}-missing-next`,
-          title: 'Add next action',
-          description: `${app.company} has no next step defined. Add one.`,
-          priority: 'Low',
-          impact: '+3 pts',
-          icon: CheckCircle,
-          color: 'text-success'
-        });
-      }
+    }
+
+    // Medium priority: Low match scores
+    if (app.matchScore && app.matchScore < 75) {
+      const techsString = app.technologies?.slice(0, 2).join(' + ') || 'relevant skills';
+      allActionItems.push({
+        id: `${appId}-lowmatch-${app.matchScore}`,
+        title: "Improve low match score",
+        description: `Your application to ${app.company} scored ${app.matchScore}%. Update your résumé to highlight ${techsString}.`,
+        priority: "Medium",
+        impact: "+10 pts",
+        icon: Clock,
+        color: "text-primary"
+      });
+    }
+
+    // Low priority: Missing next actions
+    if (!app.nextAction || app.nextAction.trim() === '') {
+      allActionItems.push({
+        id: `${appId}-missing-next`,
+        title: "Add next action",
+        description: `${app.company} application has no next step defined. Add a follow-up or preparation task.`,
+        priority: "Low",
+        impact: "+3 pts",
+        icon: CheckCircle,
+        color: "text-success"
+      });
+    }
+  });
+
+  // Sort all actions (stable order) whenever applications change
+  const sortedActions = useMemo(() => {
+    return [...allActionItems].sort((a, b) => {
+      const priorityOrder: Record<string, number> = { High: 3, Medium: 2, Low: 1 };
+      return priorityOrder[b.priority] - priorityOrder[a.priority];
     });
-    return list;
   }, [applications]);
 
-  // Sort actions once per change
-  const sortedActions = useMemo(() => {
-    const priorityOrder: Record<string, number> = { High: 3, Medium: 2, Low: 1 };
-    return [...allActionItems].sort((a,b) => priorityOrder[b.priority]-priorityOrder[a.priority]);
-  }, [allActionItems]);
-
-  // Completed
+  // Track completed actions so they do not reappear; derive visible actions from remaining
   const [completedActionIds, setCompletedActionIds] = useState<Set<string>>(new Set());
-  // Remaining pool after completions
-  const [priorityPool, setPriorityPool] = useState<PriorityAction[]>([]);
-  // Currently visible (top 3)
-  const [visibleActions, setVisibleActions] = useState<PriorityAction[]>([]);
   const [userScore, setUserScore] = useState<number>(0);
   const [isLoadingProgress, setIsLoadingProgress] = useState<boolean>(true);
   const [progressError, setProgressError] = useState<string | null>(null);
@@ -128,21 +131,24 @@ const Dashboard = () => {
     return () => { cancelled = true; };
   }, []);
 
-  // Rebuild pool and visible when sorted list or completions change
-  useEffect(() => {
-    const remaining = sortedActions.filter(a => !completedActionIds.has(a.id));
-    setPriorityPool(remaining);
-    setVisibleActions(remaining.slice(0,3));
-  }, [sortedActions, completedActionIds]);
+  const visibleActions = useMemo(
+    () => sortedActions.filter(a => !completedActionIds.has(a.id)).slice(0, 3),
+    [sortedActions, completedActionIds]
+  );
 
-  const handleCompleteAction = async (item: PriorityAction) => {
+  const handleCompleteAction = async (index: number) => {
+    const item = visibleActions[index];
     if (!item) return;
     const match = item.impact.match(/[-+]?\d+/);
     const points = match ? parseInt(match[0], 10) : 0;
 
     // Optimistic update
     setUserScore(s => s + points);
-    setCompletedActionIds(prev => new Set(prev).add(item.id));
+    setCompletedActionIds(prev => {
+      const next = new Set(prev);
+      next.add(item.id);
+      return next;
+    });
 
     try {
       await fetch('/api/user/progress/complete', {
@@ -291,7 +297,7 @@ const Dashboard = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                    {visibleActions.length > 0 ? visibleActions.map((item) => <div key={item.id} className="border border-border rounded-lg p-4">
+                {visibleActions.length > 0 ? visibleActions.map((item, index) => <div key={item.id} className="border border-border rounded-lg p-4">
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center">
                         <item.icon className={`w-4 h-4 mr-2 ${item.color}`} />
@@ -303,7 +309,7 @@ const Dashboard = () => {
                     </div>
                     <h4 className="font-medium text-sm mb-1">{item.title}</h4>
                     <p className="text-xs text-muted-foreground mb-3">{item.description}</p>
-                    <Button size="sm" variant="outline" className="w-full text-xs" onClick={() => handleCompleteAction(item)}>
+                    <Button size="sm" variant="outline" className="w-full text-xs" onClick={() => handleCompleteAction(index)}>
                       Done
                     </Button>
                   </div>) : <div className="text-center py-4">

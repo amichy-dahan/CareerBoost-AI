@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';  // ADDED useRef
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,13 +17,17 @@ const TECH_OPTIONS = [
   'Kubernetes', 'Jest', 'Cypress', 'Tailwind CSS'
 ];
 
-const MOCK_RESUMES = [
-  { id: 'resume1', fileName: 'Resume_Frontend_2025.pdf', atsScore: 87 },
-  { id: 'resume2', fileName: 'Resume_Fullstack_Updated.pdf', atsScore: 82 },
-  { id: 'resume3', fileName: 'Resume_General_v3.pdf', atsScore: 79 },
+const INITIAL_RESUMES = [
+  { id: 'resume1', fileName: 'Resume_Frontend_2025.pdf' },
+  { id: 'resume2', fileName: 'Resume_Fullstack_Updated.pdf' },
+  { id: 'resume3', fileName: 'Resume_General_v3.pdf' },
 ];
 
 export const ApplicationDrawer = ({ application, open, onOpenChange, onSave }) => {
+  // ADDED: make resumes stateful so we can append new ones
+  const [resumes, setResumes] = useState(INITIAL_RESUMES);
+  const fileInputRef = useRef(null); // hidden input for PDF selection
+
   const [formData, setFormData] = useState({
     company: application?.company || '',
     roleTitle: application?.roleTitle || '',
@@ -42,7 +46,6 @@ export const ApplicationDrawer = ({ application, open, onOpenChange, onSave }) =
     rejectionReason: application?.rejectionReason || '',
   });
 
-  // Reset form when switching between add/edit or when a different application is selected
   useEffect(() => {
     setFormData({
       company: application?.company || '',
@@ -61,6 +64,7 @@ export const ApplicationDrawer = ({ application, open, onOpenChange, onSave }) =
       offerComp: application?.offerComp || '',
       rejectionReason: application?.rejectionReason || '',
     });
+    // NOTE: intentionally not resetting resumes so user-added ones persist while component mounted
   }, [application, open]);
 
   const [newTech, setNewTech] = useState('');
@@ -87,11 +91,35 @@ export const ApplicationDrawer = ({ application, open, onOpenChange, onSave }) =
     }));
   };
 
+  // ADDED: handle selecting resume OR triggering add-new
+  const handleSelectResume = (value) => {
+    if (value === '__add_new__') {
+      fileInputRef.current?.click();
+      return;
+    }
+    setFormData(prev => ({ ...prev, resumeId: value }));
+  };
+
+  // ADDED: handle new PDF file chosen
+  const handleResumeFile = (e) => {
+    const file = e.target.files?.[0];
+    if (file && file.type === 'application/pdf') {
+      const newResume = {
+        id: `resume-${Date.now()}`,
+        fileName: file.name
+      };
+      setResumes(prev => [...prev, newResume]);
+      setFormData(prev => ({ ...prev, resumeId: newResume.id }));
+    }
+    // reset input value so same file can be picked again if needed
+    if (e.target) e.target.value = '';
+  };
+
   const isEditMode = Boolean(application);
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="sm:max-w-[600px] overflow-y-auto">
+      <SheetContent className="sm:max-ws-[600px] overflow-y-auto">
         <SheetHeader>
           <SheetTitle>
             {isEditMode ? 'Edit Application' : 'Add New Application'}
@@ -108,7 +136,6 @@ export const ApplicationDrawer = ({ application, open, onOpenChange, onSave }) =
           {/* Basic Information */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Basic Information</h3>
-            
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="company">Company *</Label>
@@ -119,7 +146,6 @@ export const ApplicationDrawer = ({ application, open, onOpenChange, onSave }) =
                   onChange={(e) => setFormData(prev => ({ ...prev, company: e.target.value }))}
                 />
               </div>
-              
               <div className="space-y-2">
                 <Label htmlFor="roleTitle">Role Title *</Label>
                 <Input
@@ -130,7 +156,6 @@ export const ApplicationDrawer = ({ application, open, onOpenChange, onSave }) =
                 />
               </div>
             </div>
-            
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="location">Location</Label>
@@ -141,7 +166,6 @@ export const ApplicationDrawer = ({ application, open, onOpenChange, onSave }) =
                   onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
                 />
               </div>
-              
               <div className="space-y-2">
                 <Label htmlFor="source">Source</Label>
                 <Select value={formData.source} onValueChange={(value) => setFormData(prev => ({ ...prev, source: value }))}>
@@ -158,7 +182,6 @@ export const ApplicationDrawer = ({ application, open, onOpenChange, onSave }) =
                 </Select>
               </div>
             </div>
-            
             <div className="space-y-2">
               <Label htmlFor="jobUrl">Job URL</Label>
               <Input
@@ -173,80 +196,85 @@ export const ApplicationDrawer = ({ application, open, onOpenChange, onSave }) =
           <Separator />
 
           {/* Resume & Status */}
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold">Resume & Status</h3>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="resume">Resume Version *</Label>
-                <Select value={formData.resumeId} onValueChange={(value) => setFormData(prev => ({ ...prev, resumeId: value }))}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select resume" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {MOCK_RESUMES.map((resume) => (
-                      <SelectItem key={resume.id} value={resume.id}>
-                        <div className="flex items-center justify-between w-full">
-                          <span className="truncate">{resume.fileName}</span>
-                          <Badge variant="secondary" className="ml-2">
-                            ATS: {resume.atsScore}%
-                          </Badge>
-                        </div>
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold">Resume & Status</h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="resume">Resume Version *</Label>
+                  <Select value={formData.resumeId} onValueChange={handleSelectResume}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select resume" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {resumes.map((resume) => (
+                        <SelectItem key={resume.id} value={resume.id}>
+                          <div className="flex items-center w-full">
+                            <span className="truncate">{resume.fileName}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                      <SelectItem value="__add_new__">
+                        <span className="text-primary font-medium">+ Add New (PDF)</span>
                       </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                    </SelectContent>
+                  </Select>
+                  {/* Hidden file input for adding new resume */}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="application/pdf"
+                    className="hidden"
+                    onChange={handleResumeFile}
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="status">Status</Label>
+                  <Select value={formData.status} onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {APPLICATION_STATUSES.map((status) => (
+                        <SelectItem key={status} value={status}>
+                          {status}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="status">Status</Label>
-                <Select value={formData.status} onValueChange={(value) => setFormData(prev => ({ ...prev, status: value }))}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select status" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {APPLICATION_STATUSES.map((status) => (
-                      <SelectItem key={status} value={status}>
-                        {status}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="appliedAt">Applied Date</Label>
+                  <Input
+                    id="appliedAt"
+                    type="date"
+                    value={formData.appliedAt}
+                    onChange={(e) => setFormData(prev => ({ ...prev, appliedAt: e.target.value }))}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="matchScore">Match Score</Label>
+                  <Input
+                    id="matchScore"
+                    type="number"
+                    min="0"
+                    max="100"
+                    placeholder="0-100"
+                    value={formData.matchScore || ''}
+                    onChange={(e) => setFormData(prev => ({ ...prev, matchScore: e.target.value ? parseInt(e.target.value) : undefined }))}
+                  />
+                </div>
               </div>
             </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="appliedAt">Applied Date</Label>
-                <Input
-                  id="appliedAt"
-                  type="date"
-                  value={formData.appliedAt}
-                  onChange={(e) => setFormData(prev => ({ ...prev, appliedAt: e.target.value }))}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="matchScore">Match Score</Label>
-                <Input
-                  id="matchScore"
-                  type="number"
-                  min="0"
-                  max="100"
-                  placeholder="0-100"
-                  value={formData.matchScore || ''}
-                  onChange={(e) => setFormData(prev => ({ ...prev, matchScore: e.target.value ? parseInt(e.target.value) : undefined }))}
-                />
-              </div>
-            </div>
-          </div>
 
           <Separator />
 
           {/* Technologies */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Technologies</h3>
-            
             <div className="space-y-2">
               <div className="flex gap-2">
                 <Select value={newTech} onValueChange={setNewTech}>
@@ -270,7 +298,6 @@ export const ApplicationDrawer = ({ application, open, onOpenChange, onSave }) =
                   <Plus className="h-4 w-4" />
                 </Button>
               </div>
-              
               <div className="flex flex-wrap gap-2">
                 {formData.technologies?.map((tech) => (
                   <Badge key={tech} variant="secondary" className="flex items-center gap-1">
@@ -290,7 +317,6 @@ export const ApplicationDrawer = ({ application, open, onOpenChange, onSave }) =
           {/* Next Actions */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Next Actions</h3>
-            
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="nextAction">Next Action</Label>
@@ -301,7 +327,6 @@ export const ApplicationDrawer = ({ application, open, onOpenChange, onSave }) =
                   onChange={(e) => setFormData(prev => ({ ...prev, nextAction: e.target.value }))}
                 />
               </div>
-              
               <div className="space-y-2">
                 <Label htmlFor="nextActionDate">Next Action Date</Label>
                 <Input
@@ -319,7 +344,6 @@ export const ApplicationDrawer = ({ application, open, onOpenChange, onSave }) =
           {/* Notes & Additional Info */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Notes & Additional Info</h3>
-            
             <div className="space-y-2">
               <Label htmlFor="tailoringNotes">Tailoring Notes</Label>
               <Textarea
@@ -330,7 +354,7 @@ export const ApplicationDrawer = ({ application, open, onOpenChange, onSave }) =
                 onChange={(e) => setFormData(prev => ({ ...prev, tailoringNotes: e.target.value }))}
               />
             </div>
-            
+
             {formData.status === 'Offer' && (
               <div className="space-y-2">
                 <Label htmlFor="offerComp">Offer Compensation</Label>
@@ -342,7 +366,7 @@ export const ApplicationDrawer = ({ application, open, onOpenChange, onSave }) =
                 />
               </div>
             )}
-            
+
             {(formData.status === 'Rejected' || formData.status === 'Ghosted') && (
               <div className="space-y-2">
                 <Label htmlFor="rejectionReason">Rejection Reason</Label>

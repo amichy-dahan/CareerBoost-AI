@@ -23,25 +23,78 @@ function buildFilter(query, userId) {
 async function list(req, res) {
   try {
     const userId = req.user.id;
-    const page = Number(req.query.page || 1);
-    const pageSize = Number(req.query.pageSize || 20);
-    const filter = buildFilter(req.query, userId);
+    let { page = 1, pageSize = 20, search } = req.query;
+    page = Math.max(parseInt(page, 10) || 1, 1);
+    pageSize = Math.min(Math.max(parseInt(pageSize, 10) || 20, 1), 200); // cap at 200
+
+    // Base filter (other filters handled by existing buildFilter for status/source/technologies)
+    const baseFilter = buildFilter(req.query, userId);
+    delete baseFilter.$or; // we'll rebuild search below for better performance
+
+    const match = { ...baseFilter };
+    let useText = false;
+    if (search) {
+      const s = String(search).trim();
+      if (s.length > 2) {
+        // If text index exists on company/roleTitle, this will leverage it
+        useText = true;
+        match.$text = { $search: s };
+      } else if (s.length) {
+        // Short prefix anchored regex (can leverage single-field indexes if added)
+        const rx = new RegExp('^' + escapeRegex(s), 'i');
+        match.$or = [{ company: rx }, { roleTitle: rx }];
+      }
+    }
+
+    const sortStage = useText
+      ? { score: { $meta: 'textScore' }, updatedAt: -1 }
+      : { updatedAt: -1 };
+
     const skip = (page - 1) * pageSize;
 
-    const [items, total] = await Promise.all([
-      Application.find(filter)
-        .sort({ updatedAt: -1 })
-        .skip(skip)
-        .limit(pageSize)
-        .lean(),
-      Application.countDocuments(filter)
-    ]);
-    const normalized = items.map(a => ({ ...a, id: a._id.toString(), _id: undefined }));
-    res.json({ items: normalized, total, page, pageSize });
+    const pipeline = [
+      { $match: match },
+      ...(useText ? [{ $addFields: { score: { $meta: 'textScore' } } }] : []),
+      {
+        $facet: {
+          meta: [ { $count: 'total' } ],
+          items: [
+            { $sort: sortStage },
+            { $skip: skip },
+            { $limit: pageSize },
+            { $project: {
+                company: 1,
+                roleTitle: 1,
+                status: 1,
+                appliedAt: 1,
+                matchScore: 1,
+                technologies: 1,
+                nextAction: 1,
+                nextActionDate: 1,
+                jobUrl: 1,
+                location: 1,
+                updatedAt: 1,
+                createdAt: 1
+              }
+            }
+          ]
+        }
+      },
+      { $project: { total: { $ifNull: [{ $first: '$meta.total' }, 0] }, items: 1 } }
+    ];
+
+    const [agg] = await Application.aggregate(pipeline).allowDiskUse(true);
+    const total = agg?.total || 0;
+    const items = (agg?.items || []).map(doc => ({ id: doc._id.toString(), ...doc }));
+    res.json({ items, total, page, pageSize, totalPages: Math.ceil(total / pageSize) });
   } catch (err) {
     console.error('List applications error', err);
     res.status(500).json({ error: 'Failed to list applications' });
   }
+}
+
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 async function getOne(req, res) {

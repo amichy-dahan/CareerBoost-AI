@@ -1,29 +1,64 @@
 import React, { useState, useMemo, useCallback, useRef, memo } from 'react';
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ExternalLink, Edit, Copy, Trash2, FileText } from "lucide-react";
+import { ExternalLink, Edit, Trash2, FileText } from "lucide-react"; // Removed Copy
 import { StatusBadge } from "./StatusBadge";
 import { TechChips } from "./TechChips";
 import { format } from "date-fns";
 
-// Memoized row component to avoid re-rendering unaffected rows
+// ---- Next Action helpers ----
+function formatNextActionDate(date) {
+  if (!date) return '';
+  const d = new Date(date);
+  if (isNaN(d.getTime())) return '';
+  return format(d, 'MMM d');
+}
+
+function getNextActionUrgency(date) {
+  if (!date) return 'none';
+  const target = new Date(date);
+  if (isNaN(target.getTime())) return 'none';
+  const today = new Date();
+  const startToday = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  const startTarget = new Date(target.getFullYear(), target.getMonth(), target.getDate());
+  const diffDays = Math.round((startTarget - startToday) / 86400000);
+  if (diffDays < 0) return 'overdue';
+  if (diffDays <= 2) return 'urgent';
+  if (diffDays <= 7) return 'upcoming';
+  return 'future';
+}
+
+function getNextActionStyle(urgency) {
+  switch (urgency) {
+    case 'overdue':
+      return 'text-destructive';
+    case 'urgent':
+      return 'text-warning';
+    case 'upcoming':
+      return 'text-primary';
+    case 'future':
+      return 'text-muted-foreground';
+    default:
+      return 'text-muted-foreground';
+  }
+}
+
+// Memoized row component (duplicate action removed)
 const ApplicationRow = memo(function ApplicationRow({
   app,
   isSelected,
   onToggle,
   onEdit,
-  onDuplicate,
   onDelete
 }) {
+  const nextActionUrgency = getNextActionUrgency(app.nextActionDate);
   return (
-    <TableRow
-      className={`hover:bg-muted/50 ${isSelected ? 'bg-accent/30' : ''}`}
-    >
+    <TableRow className={`hover:bg-muted/50 ${isSelected ? 'bg-accent/30' : ''}`}>
       <TableCell>
         <input
           type="checkbox"
           checked={isSelected}
-          onChange={() => onToggle(app.id)}
+            onChange={() => onToggle(app.id)}
         />
       </TableCell>
       <TableCell className="font-medium">
@@ -67,6 +102,22 @@ const ApplicationRow = memo(function ApplicationRow({
         </Button>
       </TableCell>
       <TableCell>
+        {app.nextAction ? (
+          <div className="space-y-1">
+            <div className="text-sm">{app.nextAction}</div>
+            {app.nextActionDate && (
+              <div className={`text-xs ${getNextActionStyle(nextActionUrgency)}`}>
+                {formatNextActionDate(app.nextActionDate)}
+                {nextActionUrgency === 'overdue' && ' (Overdue)'}
+                {nextActionUrgency === 'urgent' && ' (Due Soon)'}
+              </div>
+            )}
+          </div>
+        ) : (
+          <span className="text-xs italic text-muted-foreground">None</span>
+        )}
+      </TableCell>
+      <TableCell>
         <div className="flex gap-1">
           <Button
             size="sm"
@@ -76,15 +127,6 @@ const ApplicationRow = memo(function ApplicationRow({
             title="Edit"
           >
             <Edit className="h-4 w-4" />
-          </Button>
-          <Button
-            size="sm"
-            variant="ghost"
-            className="h-8 w-8 p-0"
-            onClick={() => onDuplicate(app)}
-            title="Duplicate"
-          >
-            <Copy className="h-4 w-4" />
           </Button>
           <Button
             size="sm"
@@ -101,12 +143,10 @@ const ApplicationRow = memo(function ApplicationRow({
   );
 });
 
-export const ApplicationsTable = ({ applications, onEdit, onDelete, onDuplicate }) => {
-  // Use Set for O(1) membership tests and stable identity operations
+export const ApplicationsTable = ({ applications, onEdit, onDelete }) => {
   const [selectedRows, setSelectedRows] = useState(() => new Set());
   const headerCheckboxRef = useRef(null);
 
-  // Precompute formatted date once per applications array change
   const preparedApps = useMemo(() => {
     return applications.map(a => ({
       ...a,
@@ -117,7 +157,6 @@ export const ApplicationsTable = ({ applications, onEdit, onDelete, onDuplicate 
   const allSelected = selectedRows.size > 0 && selectedRows.size === preparedApps.length && preparedApps.length > 0;
   const isIndeterminate = selectedRows.size > 0 && !allSelected;
 
-  // Keep indeterminate visual state synced
   React.useEffect(() => {
     if (headerCheckboxRef.current) {
       headerCheckboxRef.current.indeterminate = isIndeterminate;
@@ -148,7 +187,7 @@ export const ApplicationsTable = ({ applications, onEdit, onDelete, onDuplicate 
           <span className="text-sm font-medium">
             {selectedRows.size} applications selected
           </span>
-          <div className="flex gap-2">
+            <div className="flex gap-2">
             <Button size="sm" variant="outline">
               Bulk Status Update
             </Button>
@@ -184,6 +223,7 @@ export const ApplicationsTable = ({ applications, onEdit, onDelete, onDuplicate 
               <TableHead className="font-semibold">Status</TableHead>
               <TableHead className="font-semibold">Technologies</TableHead>
               <TableHead className="font-semibold">Resume</TableHead>
+              <TableHead className="font-semibold">Next Action</TableHead>
               <TableHead className="font-semibold w-32">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -195,7 +235,6 @@ export const ApplicationsTable = ({ applications, onEdit, onDelete, onDuplicate 
                 isSelected={selectedRows.has(app.id)}
                 onToggle={toggleRowSelection}
                 onEdit={onEdit}
-                onDuplicate={onDuplicate}
                 onDelete={onDelete}
               />
             ))}
