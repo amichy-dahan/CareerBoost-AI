@@ -5,17 +5,7 @@ import { ArrowUpRight, Calendar, CheckCircle, AlertCircle, Clock, Star } from "l
 import UserProfileCard from "./UserProfileCard";
 import { useApplications } from "@/features/applications/hooks/useApplications";
 import { useAllApplications } from "@/features/applications/hooks/useAllApplications";
-import { useState, useMemo, useEffect } from "react";
-
-interface PriorityAction {
-  id: string;
-  title: string;
-  description: string;
-  priority: 'High' | 'Medium' | 'Low';
-  impact: string; // e.g. "+15 pts"
-  icon: any;
-  color: string;
-}
+import { useState, useEffect, useMemo } from "react";
 const Dashboard = () => {
   // Keep lightweight first page fetch for immediate UI (recent activity & actions use)
   const { data: applicationsData } = useApplications();
@@ -24,14 +14,12 @@ const Dashboard = () => {
   const { applications: allApplications, isLoading: isLoadingAll } = useAllApplications();
   const applications = allApplications.length ? allApplications : firstPageApplications;
 
-  // Generate ALL potential priority actions from applications data (unfiltered; we slice later)
-  const allActionItems: PriorityAction[] = [];
+  // Generate priority actions from applications data
+  const actionItems = [];
   applications.forEach(app => {
-    const appId = app.id || app._id || app.applicationId || app.company || Math.random().toString(36).slice(2);
     // High priority: Upcoming interviews
     if (app.status === 'Tech Interview 1' || app.status === 'Tech Interview 2' || app.status === 'Final/Onsite') {
-      allActionItems.push({
-        id: `${appId}-interview-${app.status}`,
+      actionItems.push({
         title: "Prepare for upcoming interview",
         description: `You have a technical interview at ${app.company} on ${new Date(app.nextActionDate).toLocaleDateString('en-US', {
           month: 'short',
@@ -48,8 +36,7 @@ const Dashboard = () => {
     if (app.status === 'Applied' && app.appliedAt) {
       const daysSinceApplied = Math.floor((Date.now() - new Date(app.appliedAt).getTime()) / (1000 * 60 * 60 * 24));
       if (daysSinceApplied >= 5 && daysSinceApplied <= 10) {
-        allActionItems.push({
-          id: `${appId}-followup-${daysSinceApplied}`,
+        actionItems.push({
           title: "Follow up on recent application",
           description: `Your application to ${app.company} was sent on ${new Date(app.appliedAt).toLocaleDateString('en-US', {
             month: 'short',
@@ -69,8 +56,7 @@ const Dashboard = () => {
     // Medium priority: Low match scores
     if (app.matchScore && app.matchScore < 75) {
       const techsString = app.technologies?.slice(0, 2).join(' + ') || 'relevant skills';
-      allActionItems.push({
-        id: `${appId}-lowmatch-${app.matchScore}`,
+      actionItems.push({
         title: "Improve low match score",
         description: `Your application to ${app.company} scored ${app.matchScore}%. Update your résumé to highlight ${techsString}.`,
         priority: "Medium",
@@ -82,8 +68,7 @@ const Dashboard = () => {
 
     // Low priority: Missing next actions
     if (!app.nextAction || app.nextAction.trim() === '') {
-      allActionItems.push({
-        id: `${appId}-missing-next`,
+      actionItems.push({
         title: "Add next action",
         description: `${app.company} application has no next step defined. Add a follow-up or preparation task.`,
         priority: "Low",
@@ -94,78 +79,38 @@ const Dashboard = () => {
     }
   });
 
-  // Sort all actions (stable order) whenever applications change
+  // Take top 3 priority actions (memoized so we can seed local state once)
   const sortedActions = useMemo(() => {
-    return [...allActionItems].sort((a, b) => {
-      const priorityOrder: Record<string, number> = { High: 3, Medium: 2, Low: 1 };
-      return priorityOrder[b.priority] - priorityOrder[a.priority];
-    });
+    return actionItems
+      .sort((a, b) => {
+        const priorityOrder: Record<string, number> = { High: 3, Medium: 2, Low: 1 };
+        return priorityOrder[b.priority] - priorityOrder[a.priority];
+      })
+      .slice(0, 3);
   }, [applications]);
 
-  // Track completed actions so they do not reappear; derive visible actions from remaining
-  const [completedActionIds, setCompletedActionIds] = useState<Set<string>>(new Set());
+  // Local state for actions so we can remove after completion, and score state
+  const [priorityActions, setPriorityActions] = useState<typeof sortedActions>([]);
   const [userScore, setUserScore] = useState<number>(0);
-  const [isLoadingProgress, setIsLoadingProgress] = useState<boolean>(true);
-  const [progressError, setProgressError] = useState<string | null>(null);
 
-  // Load persisted progress (score + completed actions)
+  // Initialize / refresh priority actions only if we currently have none (prevents resurrecting completed ones
+  // unless the underlying list changes shape dramatically e.g., user gets new actions and ours is empty)
   useEffect(() => {
-    let cancelled = false;
-    (async () => {
-      try {
-        const res = await fetch('/api/user/progress', { credentials: 'include' });
-        if (!res.ok) throw new Error('Failed to load progress');
-        const data = await res.json();
-        if (!cancelled) {
-          setUserScore(data.careerScore || 0);
-          if (Array.isArray(data.completedPriorityActions)) {
-            setCompletedActionIds(new Set(data.completedPriorityActions));
-          }
-        }
-      } catch (e: any) {
-        if (!cancelled) setProgressError(e.message || 'Error loading progress');
-      } finally {
-        if (!cancelled) setIsLoadingProgress(false);
-      }
-    })();
-    return () => { cancelled = true; };
-  }, []);
-
-  const visibleActions = useMemo(
-    () => sortedActions.filter(a => !completedActionIds.has(a.id)).slice(0, 3),
-    [sortedActions, completedActionIds]
-  );
-
-  const handleCompleteAction = async (index: number) => {
-    const item = visibleActions[index];
-    if (!item) return;
-    const match = item.impact.match(/[-+]?\d+/);
-    const points = match ? parseInt(match[0], 10) : 0;
-
-    // Optimistic update
-    setUserScore(s => s + points);
-    setCompletedActionIds(prev => {
-      const next = new Set(prev);
-      next.add(item.id);
-      return next;
-    });
-
-    try {
-      await fetch('/api/user/progress/complete', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ actionId: item.id, points })
-      });
-    } catch (e) {
-      // Rollback on failure
-      setUserScore(s => s - points);
-      setCompletedActionIds(prev => {
-        const next = new Set(prev);
-        next.delete(item.id);
-        return next;
-      });
+    if (priorityActions.length === 0 && sortedActions.length > 0) {
+      setPriorityActions(sortedActions);
     }
+  }, [sortedActions, priorityActions.length]);
+
+  const handleCompleteAction = (index: number) => {
+    setPriorityActions(prev => {
+      const item = prev[index];
+      if (!item) return prev;
+      // Extract numeric impact (e.g., "+15 pts")
+      const match = item.impact.match(/[-+]?\d+/);
+      const points = match ? parseInt(match[0], 10) : 0;
+      setUserScore(s => s + points);
+      return prev.filter((_, i) => i !== index);
+    });
   };
 
   // Calculate career readiness metrics
@@ -297,7 +242,7 @@ const Dashboard = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                {visibleActions.length > 0 ? visibleActions.map((item, index) => <div key={item.id} className="border border-border rounded-lg p-4">
+                {priorityActions.length > 0 ? priorityActions.map((item, index) => <div key={index} className="border border-border rounded-lg p-4">
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center">
                         <item.icon className={`w-4 h-4 mr-2 ${item.color}`} />
