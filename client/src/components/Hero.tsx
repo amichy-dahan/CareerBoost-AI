@@ -1,5 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight, CheckCircle, Upload, Github, Linkedin } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { ArrowRight, CheckCircle, Upload, Linkedin, Calendar } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 const Hero = () => {
   const navigate = useNavigate();
@@ -45,45 +47,42 @@ const Hero = () => {
           </div>
 
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary-glow/20 rounded-3xl blur-3xl"></div>
-            <div className="relative bg-card border border-border rounded-2xl p-8 shadow-elegant">
-              <div className="space-y-6">
-                <h3 className="text-lg font-semibold mx-[20px]">Career Readiness Overview</h3>
-                
-                <div className="grid grid-cols-3 gap-4 mb-6">
+            <div className="absolute inset-0 bg-gradient-to-r from-primary/25 to-primary-glow/25 rounded-3xl blur-3xl"></div>
+            <Card className="relative border border-border/70 shadow-elegant rounded-2xl backdrop-blur-sm">
+              <CardHeader className="pb-4">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base lg:text-lg font-semibold">Career Readiness Overview</CardTitle>
+                  <Badge variant="secondary" className="flex items-center gap-1 text-[11px] font-medium">
+                    <Calendar className="w-3.5 h-3.5" />
+                    Updated today
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-3 gap-6 mb-6">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-success mb-1">84%</div>
-                    <div className="text-xs text-muted-foreground">Avg Match Score</div>
+                    <div className="text-2xl lg:text-3xl font-bold text-success mb-1">62%</div>
+                    <div className="text-xs text-muted-foreground">Interview Rate</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-primary mb-1">7</div>
+                    <div className="text-2xl lg:text-3xl font-bold text-primary mb-1">7</div>
                     <div className="text-xs text-muted-foreground">Active Applications</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-warning mb-1">3</div>
+                    <div className="text-2xl lg:text-3xl font-bold text-warning mb-1">3</div>
                     <div className="text-xs text-muted-foreground">Pending Actions</div>
                   </div>
-                </div>
-
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium text-sm mx-[26px]">Resume Score</span>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-24 h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="w-11/12 h-full bg-success rounded-full"></div>
-                      </div>
-                      <span className="text-sm font-medium w-10">92%</span>
-                    </div>
+                  <div className="col-span-3 text-center text-[11px] tracking-wide text-muted-foreground">
+                    Example portfolio view • 18 total applications
                   </div>
                 </div>
-
-                <div className="pt-4 border-t border-border">
-                  <p className="text-sm text-muted-foreground mx-[24px]">
-                    <strong className="text-foreground">Next Action:</strong> Prepare for BigTech Inc technical interview
+                <div className="mt-2 pt-4 border-t border-border/60">
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    <span className="font-medium text-foreground">Next Action:</span> Prepare for BigTech Inc technical interview.
                   </p>
                 </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
       </div>
