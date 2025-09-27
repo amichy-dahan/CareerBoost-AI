@@ -11,12 +11,14 @@ async function login(req, res, next) {
             process.env.JWT_SECRET,
             { expiresIn: "1h" }
         );
-
+        // IMPORTANT: secure cookies over HTTP (local dev) are rejected by browsers -> leads to "No token provided"
+        const isProd = process.env.PROD === 'true';
         res.cookie("token", token, {
             httpOnly: true,
-            secure: true,
-            sameSite: "none",
-            maxAge: 1000 * 60 * 60 // שעה
+            secure: isProd,                 // only secure in production (HTTPS)
+            sameSite: isProd ? "none" : "lax", // allow cross-port localhost requests
+            path: '/',                       // explicit root path
+            maxAge: 1000 * 60 * 60           // 1 hour
         });
 
         res.json({ message: "Logged in successfully", user });

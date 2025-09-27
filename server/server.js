@@ -47,8 +47,13 @@ const allowedOrigins = Array.from(new Set([
 ]));
 console.log('[CORS] Allowed origins:', allowedOrigins);
 app.use(cors({
-  origin: process.env.PROD === "true"? `https://careerboost-ai-1.onrender.com`:`http://localhost:8080`,
-  credentials: true 
+  origin: (origin, cb) => {
+    // Allow non-browser (no origin) or exact match from list
+    if (!origin) return cb(null, true);
+    if (allowedOrigins.includes(origin)) return cb(null, true);
+    return cb(new Error('CORS origin not allowed: ' + origin));
+  },
+  credentials: true
 }));
 
 app.use('/users', router);
@@ -73,7 +78,14 @@ app.get("/",(req, res)=>{
   res.send("hello word career boost");
 })
 app.get("/logout", (req, res) => {
-  res.cookie("token", "", { httpOnly: true, secure: true, sameSite: "none", maxAge: 0 });
+  const isProd = process.env.PROD === 'true';
+  res.cookie("token", "", {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: isProd ? 'none' : 'lax',
+    path: '/',
+    maxAge: 0
+  });
   res.redirect("/login");
 });
 
