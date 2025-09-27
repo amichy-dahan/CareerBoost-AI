@@ -12,7 +12,14 @@ const TECH_OPTIONS = [
   'Next.js', 'Vue.js', 'Angular', 'Express.js'
 ];
 
-export const FiltersBar = ({ filters, onFiltersChange, onExport, totalResults }) => {
+export const FiltersBar = ({ 
+  filters, 
+  onFiltersChange, 
+  onExport, 
+  totalResults,
+  pageSize,
+  onPageSizeChange
+}) => {
   const [selectedStatus, setSelectedStatus] = useState('');
   const [selectedTech, setSelectedTech] = useState('');
 
@@ -78,6 +85,21 @@ export const FiltersBar = ({ filters, onFiltersChange, onExport, totalResults })
           </div>
 
           <div className="flex gap-2 items-center">
+            {/* Page size selector */}
+            {typeof pageSize !== 'undefined' && onPageSizeChange && (
+              <Select value={String(pageSize)} onValueChange={(v) => onPageSizeChange(Number(v))}>
+                <SelectTrigger className="w-[90px]">
+                  <SelectValue placeholder="Page" />
+                </SelectTrigger>
+                <SelectContent>
+                  {[20, 50, 100].map(size => (
+                    <SelectItem key={size} value={String(size)}>
+                      {size}/pg
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
             <Button variant="outline" onClick={onExport} className="flex items-center gap-2">
               <Download className="h-4 w-4" />
               Export CSV
@@ -85,6 +107,16 @@ export const FiltersBar = ({ filters, onFiltersChange, onExport, totalResults })
             <div className="text-sm text-muted-foreground flex items-center whitespace-nowrap">
               {totalResults} applications
             </div>
+            {totalResults > pageSize && pageSize < 500 && (
+              <Button 
+                variant="ghost" 
+                className="text-xs" 
+                onClick={() => onPageSizeChange(Math.min(totalResults, 500))}
+                title="Load all (capped at 500 for performance)"
+              >
+                Show All
+              </Button>
+            )}
           </div>
         </div>
       </div>
