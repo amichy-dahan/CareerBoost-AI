@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { generateResumeFeedback } = require('../../ai-integration/gemini.service');
+const { generateResumeFeedback } = require('../ai-integration/gemini.service');
 
 // Smoke-test route: client sends resumeText + jobDescription
 router.post('/:profileId', async (req, res) => {
