@@ -22,7 +22,7 @@ const Features = () => {
     {
       icon: Sparkles,
       title: "AI-Powered Résumé Builder",
-      description: "Generate tailored, ATS-friendly résumés designed to match specific roles.",
+      description: "Generate tailored résumés designed to match specific roles.",
       benefits: ["Role-specific customization", "Quantified bullet suggestions", "Multiple versions for different jobs"],
       color: "text-orange-600"
     }
