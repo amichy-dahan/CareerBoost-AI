@@ -9,12 +9,11 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import Navigation from "@/components/Navigation";
-import { FileText, Wand2, Copy, Save, Download, Upload, Sparkles, Plus, X, GraduationCap, Briefcase } from "lucide-react";
+import { FileText, Wand2, Copy, Save, Download, Sparkles, Plus, X, GraduationCap, Briefcase } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 export default function GenerateResumePage() {
   const [output, setOutput] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isParsing, setIsParsing] = useState(false);
   const [skillCount, setSkillCount] = useState(1);
   const [eduCount, setEduCount] = useState(1);
   const [expCount, setExpCount] = useState(1);
@@ -47,7 +46,7 @@ export default function GenerateResumePage() {
         bullets: [""],
         tech: []
       }],
-      oldResumeText: ""
+      
     }
   });
   const {
@@ -59,26 +58,6 @@ export default function GenerateResumePage() {
     },
     watch
   } = form;
-  async function onParseOldResume(file) {
-    if (!file) return;
-    setIsParsing(true);
-    try {
-      const text = `Mock parsed text from ${file.name}. This would contain the extracted resume content.`;
-      setValue("oldResumeText", text);
-      toast({
-        title: "Resume parsed successfully",
-        description: "Extracted text has been added to the form."
-      });
-    } catch (error) {
-      toast({
-        title: "Parsing failed",
-        description: "Could not extract text from the uploaded file.",
-        variant: "destructive"
-      });
-    } finally {
-      setIsParsing(false);
-    }
-  }
   async function onGenerate(values) {
     setIsGenerating(true);
     try {
@@ -158,7 +137,12 @@ Technologies: React, TypeScript, Tailwind CSS, Vercel`;
               {/* Target Role */}
               <div className="space-y-2">
                 <Label htmlFor="targetRole" className="text-sm font-medium">Target Job (Optional)</Label>
-                <Input id="targetRole" {...register("targetRole")} placeholder="e.g., Junior Frontend Developer" className="w-full" />
+                <Textarea
+                  id="targetRole"
+                  {...register("targetRole")}
+                  placeholder="Describe the target role or type of positions you're aiming for (e.g., Junior Frontend Developer focusing on React & accessibility, interested in startups)."
+                  className="w-full min-h-[80px] resize-y"
+                />
                 <p className="text-xs text-muted-foreground">
                   Helps tailor keywords and focus for your resume
                 </p>
@@ -339,17 +323,7 @@ Technologies: React, TypeScript, Tailwind CSS, Vercel`;
                 <Separator />
               </div>
 
-              {/* Old Resume Upload */}
-              <div className="space-y-3">
-                <Label className="text-sm font-medium flex items-center gap-2">
-                  <Upload className="h-4 w-4" />
-                  Upload Existing Resume (Optional)
-                </Label>
-                <Input type="file" accept=".pdf,.doc,.docx" onChange={e => e.target.files?.[0] && onParseOldResume(e.target.files[0])} disabled={isParsing} className="my-[20px]" />
-                <Textarea {...register("oldResumeText")} placeholder="Extracted text will appear here (for AI context)" className="h-24 font-mono text-sm" />
-              </div>
-
-              <Separator />
+              {/* Removed 'Upload Existing Resume' section per request */}
 
               {/* Generate Button */}
               <Button onClick={handleSubmit(onGenerate)} className="w-full bg-gradient-to-r from-primary to-primary-glow hover:from-primary/90 hover:to-primary-glow/90" size="lg" disabled={isGenerating}>
