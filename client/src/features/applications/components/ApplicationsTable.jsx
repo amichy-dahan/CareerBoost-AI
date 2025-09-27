@@ -180,6 +180,25 @@ export const ApplicationsTable = ({ applications, onEdit, onDelete }) => {
 
   const clearSelection = useCallback(() => setSelectedRows(new Set()), []);
 
+  // Edit the single selected application (must be exactly one)
+  const handleEditSelected = useCallback(() => {
+    if (selectedRows.size !== 1) {
+      alert('Select exactly one application to edit.');
+      return;
+    }
+    const onlyId = [...selectedRows][0];
+    const app = preparedApps.find(a => a.id === onlyId);
+    if (app) onEdit(app);
+  }, [selectedRows, preparedApps, onEdit]);
+
+  // Erase all selected applications after confirmation
+  const handleEraseSelected = useCallback(() => {
+    if (selectedRows.size === 0) return;
+    if (!window.confirm(`Erase ${selectedRows.size} selected application(s)? This cannot be undone.`)) return;
+    selectedRows.forEach(id => onDelete(id));
+    clearSelection();
+  }, [selectedRows, onDelete, clearSelection]);
+
   return (
     <div className="space-y-4">
       {selectedRows.size > 0 && (
@@ -187,12 +206,17 @@ export const ApplicationsTable = ({ applications, onEdit, onDelete }) => {
           <span className="text-sm font-medium">
             {selectedRows.size} applications selected
           </span>
-            <div className="flex gap-2">
-            <Button size="sm" variant="outline">
-              Bulk Status Update
+          <div className="flex gap-2">
+            <Button size="sm" variant="outline" onClick={handleEditSelected}>
+              Edit Selected
             </Button>
-            <Button size="sm" variant="outline">
-              Export Selected
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-destructive border-destructive/40 hover:bg-destructive/10"
+              onClick={handleEraseSelected}
+            >
+              Erase Selected
             </Button>
           </div>
           <Button
