@@ -90,8 +90,8 @@ const userProgressRouter = require('./Routes/userProgress');
 const priorityActionsRouter = require('./Routes/priorityActions');
 app.use("/api/feedback", feedbackRouter);
 app.use('/applications', applicationsRouter);
-app.use('/api/user/progress', userProgressRouter);
-app.use('/api/priority-actions', priorityActionsRouter);
+app.use('/user/progress', userProgressRouter);
+app.use('/priority-actions', priorityActionsRouter);
 
 // Central error handler (including CORS rejections) before DB start message
 app.use((err, req, res, next) => {
