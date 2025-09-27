@@ -1,7 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowUpRight, Calendar, CheckCircle, AlertCircle, Clock, Star } from "lucide-react";
+import { Calendar, CheckCircle, AlertCircle, Clock, Star } from "lucide-react";
 import UserProfileCard from "./UserProfileCard";
 import { useApplications } from "@/features/applications/hooks/useApplications";
 import { useAllApplications } from "@/features/applications/hooks/useAllApplications";
@@ -163,10 +163,12 @@ const Dashboard = () => {
   };
 
   // Calculate career readiness metrics
-  const averageMatchScore = applications.length > 0 ? Math.round(applications.reduce((sum, app) => sum + (app.matchScore || 0), 0) / applications.length) : 0;
+  const totalApplications = applications.length;
+  const interviewStatuses = ['HR Screen','Tech Interview 1','Tech Interview 2','Final/Onsite']; // statuses counted as interviews
+  const interviewCount = applications.filter(app => interviewStatuses.includes(app.status)).length;
+  const interviewRate = totalApplications > 0 ? Math.round((interviewCount / totalApplications) * 100) : 0; // percentage of applications that reached interview stage
   const activeApplications = applications.filter(app => !['Rejected', 'Ghosted', 'Withdrawn'].includes(app.status)).length;
   const pendingActions = applications.filter(app => app.nextAction && app.nextActionDate && new Date(app.nextActionDate) >= new Date()).length;
-  const totalApplications = applications.length;
 
   // Generate recent activity
   const recentActivity = [];
@@ -228,8 +230,8 @@ const Dashboard = () => {
               <CardContent>
                 <div className="grid grid-cols-3 gap-6 mb-8">
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-success mb-2">{averageMatchScore}%</div>
-                    <div className="text-sm text-muted-foreground">Avg Match Score</div>
+                    <div className="text-3xl font-bold text-success mb-2">{interviewRate}%</div>
+                    <div className="text-sm text-muted-foreground">Interview Rate</div>
                   </div>
                   <div className="text-center">
                     <div className="text-3xl font-bold text-primary mb-2">{activeApplications}</div>
@@ -244,18 +246,7 @@ const Dashboard = () => {
                   </div>
                 </div>
 
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">Resume Score</span>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-32 h-2 bg-muted rounded-full overflow-hidden">
-                        <div className="w-11/12 h-full bg-success rounded-full"></div>
-                      </div>
-                      <span className="text-sm font-medium w-12">92%</span>
-                      <ArrowUpRight className="w-4 h-4 text-success" />
-                    </div>
-                  </div>
-                </div>
+                {/* Resume Score section removed as per request */}
               </CardContent>
             </Card>
 
