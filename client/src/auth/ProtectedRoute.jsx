@@ -5,7 +5,8 @@ import axios from "axios";
 function ProtectedRoute({ children }) {
   const [loading, setLoading] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
-  const serverUrl = "https://careerboost-ai-al0j.onrender.com";
+// const prod = false;
+const serverUrl ="https://careerboost-ai-al0j.onrender.com";
 
   useEffect(() => {
     const checkAuth = async () => {

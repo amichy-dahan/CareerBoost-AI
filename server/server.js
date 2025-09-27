@@ -15,7 +15,7 @@ const cookieParser = require('cookie-parser');
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: process.env.PROD === "true"? `https://careerboost-ai-1.onrender.com`:`http://localhost:${process.env.PORT}`,
+  origin: process.env.PROD === "true"? `https://careerboost-ai-1.onrender.com`:`http://localhost:8080`,
   credentials: true 
 }));
 
