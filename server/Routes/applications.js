@@ -5,7 +5,7 @@ const { list, getOne, create, update, remove } = require('../controller/Applicat
 const Application = require('../models/Application');
 
 // All application routes require auth
-router.use(authenticate);
+// router.use(authenticate);
 
 router.get('/', list);
 router.get('/:id', getOne);
